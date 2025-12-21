@@ -10,10 +10,12 @@ class CustomBottomNavBar extends StatelessWidget {
     super.key,
     required this.currentIndex,
     required this.onTap,
+    required this.onCenterTapped
   });
 
   final int currentIndex;
   final Function(int) onTap;
+  final Function() onCenterTapped;
 
   @override
   Widget build(BuildContext context) {
@@ -27,15 +29,12 @@ class CustomBottomNavBar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 0),
             alignment: Alignment.bottomCenter,
             decoration: const BoxDecoration(
-              color: Color(0xff333333),
+              color: AppColors.tabBackgroundColor,
               borderRadius: BorderRadius.all(Radius.circular(6)),
               boxShadow: [
                 BoxShadow(
                   color: Color(0x60000000),
                   blurStyle: BlurStyle.outer,
-                  // blurRadius: 8,
-                  // spreadRadius: 20,
-                  // offset: Offset(0, 0),
                 ),
               ],
             ),
@@ -67,7 +66,10 @@ class CustomBottomNavBar extends StatelessWidget {
               paintOnTop: true,
               child: _CenterNavItem(
                 iconPath: AppIcons.scanIcon,
-                onTap: () => onTap(1),
+                onTap: () {
+                  onTap(1);
+                  onCenterTapped();
+                }
               ),
             ),
           ),
@@ -94,7 +96,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected ? AppColors.secondary : Color(0xffD9D9D9);
+    final color = isSelected ? AppColors.secondary : AppColors.iconColor;
     return InkWell(
       onTap: onTap,
       splashColor: Colors.transparent,

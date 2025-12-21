@@ -2,7 +2,9 @@ abstract class AppIcons {
   static const String generateIcon = 'assets/icons/generate-icon.svg';
   static const String historyIcon = 'assets/icons/history-icon.svg';
   static const String scanIcon = 'assets/icons/scan-icon.svg';
-  // static const String savedIcon = 'assets/icons/saved-icon.svg';
+  static const String gallaryIcon = 'assets/icons/gallary-icon.svg';
+  static const String cameraFlashIcon = 'assets/icons/flash-icon.svg';
+  static const String swapCamIcon = 'assets/icons/swap-cam-icon.svg';
 }
 
 abstract class AppImages {
