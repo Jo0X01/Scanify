@@ -1,4 +1,4 @@
 abstract class AppHive {
-  static const String watchListBox = 'watch_list_box';
-  static const int watchListItemTypeId = 0;
+  static const String qrcodesBox = 'qrcodes_scanners';
+  static const int qrcodesId = 0;
 }

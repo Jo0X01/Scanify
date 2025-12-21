@@ -8,8 +8,8 @@ abstract class AppColors {
   static const Color red = Color(0xffFF0000);
   static const Color orange = Color(0xffFFA500);
   static const Color blue = Color(0xff2986cc);
-
-  
+  static const Color tabBackgroundColor = Color(0xff333333);
+  static const Color iconColor = Color(0xffD9D9D9);
   static const Color primary = Color(0xFF121212);
   static const Color secondary = Color(0xFFFFC107);
   static const Color background = Color(0xFFFFFFFF);
