@@ -1,9 +1,32 @@
 abstract class AppStrings {
-  static const String generate = 'Generate';
-  static const String history = 'history';
-  static const String watchList = 'Watch list';
-  static const String details = 'Details';
+  static const String generate = 'Generate QR';
+  static const String history = 'History';
+  static const String generateQRCode = "Generate QR Code";
+  static const String details = "QR Code Details";
+  static const String share = "Share";
+  static const String copy = "Copy";
+  static const String save = "Save";
+
   static const String noBarCodeFoundInImageError = 'No Barcode/QRCode found in selected image';
+  static const String cameraPath = "/storage/emulated/0/DCIM/QRCodeScanner/";
+  static const String tempShareQRFileName = ".temp_share_qr_code.png";
+
+  static const String business = 'Business';
+  static const String contact = 'Contact';
+  static const String wifi = 'Wifi';
+  static const String text = 'Text';
+  static const String twitter = 'Twitter';
+  static const String website = 'Website';
+  static const String whatsapp = 'WhatsApp';
+  static const String telephone = 'Telephone';
+  static const String location = 'Location';
+  static const String instagram = 'Instagram';
+  static const String event = 'Event';
+  static const String email = 'Email';
+
+  static const List<String> wifiSecurityList = ["None","WEP","WPA/WPA2","WPA3"];
+  static const String wifiQRPattern = "WIFI:S:{S};T:{T};P:{P};H:{H};;";
+
 
   static const String fontPoppins = 'Poppins';
   static const String fontRoboto = 'Roboto';

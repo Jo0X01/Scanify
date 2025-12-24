@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
-
-class AppStrings {
-  static const String fontPrimary = 'Poppins';
-  static const String fontSecondary = 'Roboto';
-}
+import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
 
 class AppTheme {
   static ThemeData light = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    fontFamily: AppStrings.fontPrimary,
+    fontFamily: AppStrings.fontPoppins,
     colorScheme: const ColorScheme(
       brightness: Brightness.light,
       primary: AppColors.primary,
@@ -32,7 +28,7 @@ class AppTheme {
       backgroundColor: AppColors.primary,
       iconTheme: IconThemeData(color: AppColors.onPrimary),
       titleTextStyle: TextStyle(
-        fontFamily: AppStrings.fontPrimary,
+        fontFamily: AppStrings.fontPoppins,
         fontSize: 20,
         fontWeight: FontWeight.w700,
         color: AppColors.onPrimary,
@@ -59,12 +55,12 @@ class AppTheme {
         fontSize: 16,
         fontWeight: FontWeight.normal,
         color: AppColors.onBackground,
-        fontFamily: AppStrings.fontSecondary,
+        fontFamily: AppStrings.fontRoboto,
       ),
       bodyMedium: TextStyle(
         fontSize: 14,
         color: AppColors.onBackground,
-        fontFamily: AppStrings.fontSecondary,
+        fontFamily: AppStrings.fontRoboto,
       ),
       labelLarge: TextStyle(
         fontSize: 14,
@@ -109,7 +105,7 @@ class AppTheme {
   static ThemeData dark = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    fontFamily: AppStrings.fontPrimary,
+    fontFamily: AppStrings.fontPoppins,
     colorScheme: const ColorScheme(
       brightness: Brightness.dark,
       primary: AppColors.primary,
@@ -129,7 +125,7 @@ class AppTheme {
       backgroundColor: AppColors.primary,
       iconTheme: IconThemeData(color: AppColors.onPrimary),
       titleTextStyle: TextStyle(
-        fontFamily: AppStrings.fontPrimary,
+        fontFamily: AppStrings.fontPoppins,
         fontSize: 20,
         fontWeight: FontWeight.bold,
         color: AppColors.onPrimary,

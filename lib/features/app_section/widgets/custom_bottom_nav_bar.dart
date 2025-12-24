@@ -24,9 +24,9 @@ class CustomBottomNavBar extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Container(
-            height: MediaQuery.of(context).size.height / 12,
+            height: MediaQuery.of(context).size.height / 11,
             margin: const EdgeInsets.only(left: 40, right: 40, bottom: 33),
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 0),
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
             alignment: Alignment.bottomCenter,
             decoration: const BoxDecoration(
               color: AppColors.tabBackgroundColor,
@@ -156,15 +156,15 @@ class _CenterNavItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 70,
-        height: 70,
+        width: 60,
+        height: 60,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: AppColors.secondary,
           shape: BoxShape.circle,
           boxShadow: [BoxShadow(color: AppColors.secondary, blurRadius: 15)],
         ),
-        child: SvgPicture.asset(iconPath, width: 40, height: 40),
+        child: SvgPicture.asset(iconPath, width: 35, height: 35),
       ),
     );
   }

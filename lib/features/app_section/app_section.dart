@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
-import 'package:qrcode_scanner_app/core/constants/app_settings.dart';
 import 'package:qrcode_scanner_app/features/app_section/widgets/custom_bottom_nav_bar.dart';
+import 'package:qrcode_scanner_app/features/generate/view/screens/generate_screen.dart';
 import 'package:qrcode_scanner_app/features/scan/view/screens/scan_screen.dart';
 
 class QRCodeScannerApp extends StatefulWidget {
@@ -22,7 +22,7 @@ class _QRCodeScannerAppState extends State<QRCodeScannerApp> {
     super.initState();
     scanScreen =  ScanScreen();
     _screens = [
-      Scaffold(),
+      GenerateScreen(),
       scanScreen,
       Scaffold()
     ];
