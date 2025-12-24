@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
 import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
 import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
+import 'package:qrcode_scanner_app/core/widgets/custom_back_appbar.dart';
 
 class GenerateScreenFormCustomWidget extends StatelessWidget {
   const GenerateScreenFormCustomWidget({
@@ -20,29 +21,8 @@ class GenerateScreenFormCustomWidget extends StatelessWidget {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 100,
-          leading: null,
-          automaticallyImplyLeading: false,
-          title: Row(
-            spacing: 25,
-            children: [
-              GestureDetector(
-                onTap: Navigator.of(context).pop,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.tabBackgroundColor,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: SvgPicture.asset(AppIcons.backIcon, width: 25, height: 25),
-                ),
-              ),
-              Text(AppStrings.wifi),
-            ],
-          ),
+        appBar: CustomBackAppBar(
+          title: AppStrings.wifi,
         ),
         body: SingleChildScrollView(
           child: Container(

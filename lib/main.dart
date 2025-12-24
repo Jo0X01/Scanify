@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
 import 'package:qrcode_scanner_app/core/utils/app_theme.dart';
 import 'package:qrcode_scanner_app/features/app_section/app_section.dart';
+import 'package:qrcode_scanner_app/features/details/view/screens/details_screen.dart';
 import 'package:qrcode_scanner_app/features/generate/view/screens/generate_screen.dart';
 import 'package:qrcode_scanner_app/features/generate/view/screens/wifi_screen.dart';
 import 'package:qrcode_scanner_app/features/scan/view/screens/scan_screen.dart';
@@ -29,7 +30,7 @@ class QRCodeScanner extends StatelessWidget {
       routes: {
         AppRoutes.scanScreenRoute:(context) => ScanScreen(),
         AppRoutes.generateScreen:(context) => GenerateScreen(),
-        AppRoutes.detailsScreen:(context) => Scaffold(),
+        AppRoutes.detailsScreen:(context) => DetailsScreen(),
         AppRoutes.wifiScreen:(context) => WifiScreen(),
       },
     );

@@ -2,9 +2,14 @@ abstract class AppStrings {
   static const String generate = 'Generate QR';
   static const String history = 'History';
   static const String generateQRCode = "Generate QR Code";
-
+  static const String details = "QR Code Details";
+  static const String share = "Share";
+  static const String copy = "Copy";
+  static const String save = "Save";
 
   static const String noBarCodeFoundInImageError = 'No Barcode/QRCode found in selected image';
+  static const String cameraPath = "/storage/emulated/0/DCIM/QRCodeScanner/";
+  static const String tempShareQRFileName = ".temp_share_qr_code.png";
 
   static const String business = 'Business';
   static const String contact = 'Contact';

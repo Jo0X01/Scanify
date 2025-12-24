@@ -6,6 +6,9 @@ abstract class AppIcons {
   static const String cameraFlashIcon = 'assets/icons/flash-icon.svg';
   static const String swapCamIcon = 'assets/icons/swap-cam-icon.svg';
   static const String backIcon = 'assets/icons/back-icon.svg';
+  static const String copyIcon = 'assets/icons/copy-icon.svg';
+  static const String shareIcon = 'assets/icons/share-icon.svg';
+  static const String saveIcon = 'assets/icons/save-icon.svg';
 
   static const String businessIcon = 'assets/icons/business-icon.svg';
   static const String contactIcon = 'assets/icons/contact-icon.svg';
@@ -25,4 +28,5 @@ abstract class AppIcons {
 abstract class AppImages {
   static const String noSavedMovies = 'assets/images/no_saved_movies.png';
   static const String noSearchResults = 'assets/images/no_search_results.png';
+  static const String appLogo = 'assets/images/app-logo.png';
 }

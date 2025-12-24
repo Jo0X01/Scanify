@@ -6,6 +6,7 @@ abstract class AppRoutes {
   static const String detailsScreen = "/DetailsScreen";
   static const String generateScreen = "/GenerateScreen";
   static const String wifiScreen = "/WifiScreen";
+  static const String settingsScreen = "/SettingsScreen";
   
   static const String businessScreen = '/BusinessScreen';
   static const String contactScreen = '/ContactScreen';

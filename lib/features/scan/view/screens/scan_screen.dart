@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
 import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
 import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
-import 'package:qrcode_scanner_app/core/utils/app_dialogs.dart';
+import 'package:qrcode_scanner_app/core/dialogs/app_dialogs.dart';
 import 'package:qrcode_scanner_app/features/scan/view/widgets/cusomt_painter_box_widget.dart';
 import 'package:qrcode_scanner_app/features/scan/view/widgets/tool_bar_custom_widget.dart';
 
@@ -29,7 +29,20 @@ class _ScanScreenState extends State<ScanScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          MobileScanner(controller: controller, onDetect: _onDetectBarcode),
+          MobileScanner(
+            controller: controller,
+            overlayBuilder: (context, constraints) {
+              return ValueListenableBuilder<bool>(
+                valueListenable: isDetectedController,
+                builder: (context, value, child) {
+                  return Text(
+                    isDetectedController.value ? "Tap To Scan" : "Waiting..",
+                  );
+                },
+              );
+            },
+            onDetect: _onDetectBarcode,
+          ),
           Center(
             child: Container(
               width: scanSize,
@@ -42,8 +55,11 @@ class _ScanScreenState extends State<ScanScreen> {
             child: SizedBox(
               width: scanSize,
               height: scanSize,
-              child: CustomPaint(
-                painter: CusomtPainterBoxWidget(detected: isDetected),
+              child: ValueListenableBuilder<bool>(
+                valueListenable: isDetectedController,
+                builder: (context, isDetected, _) => CustomPaint(
+                  painter: CusomtPainterBoxWidget(detected: isDetected),
+                ),
               ),
             ),
           ),
@@ -62,6 +78,10 @@ class _ScanScreenState extends State<ScanScreen> {
                 icon: AppIcons.swapCamIcon,
                 onTap: controller.switchCamera,
               ),
+              ToolBarData(
+                icon: AppIcons.settingsIcon,
+                onTap: _navigateToSettings,
+              ),
             ],
           ),
         ],
@@ -69,22 +89,28 @@ class _ScanScreenState extends State<ScanScreen> {
     );
   }
 
-void _onDetectBarcode(BarcodeCapture barcode) {
-  final String? code = barcode.barcodes.first.rawValue;
-  if (code == null || isDetected) return;
-
-  setState(() => isDetected = true);
-
-  if (widget.captureMe) {
-    Navigator.of(context).pushNamed(AppRoutes.detailsScreen, arguments: code);
+  void _navigateToSettings() {
+    AppRoutes.navigateTo(context, AppRoutes.settingsScreen);
   }
-  Future.delayed(const Duration(seconds: 1), () {
-    if (mounted) {
-      setState(() => isDetected = false);
-    }
-  });
-}
 
+  void _onDetectBarcode(BarcodeCapture barcode) {
+    final String? code = barcode.barcodes.first.rawValue;
+    if (code == null) return;
+
+    isDetectedController.value = true;
+
+    if (widget.captureMe) {
+      Navigator.of(context).pushNamed(AppRoutes.detailsScreen, arguments: code);
+      widget.captureMe = false;
+      isDetectedController.value = false;
+      return;
+    }
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        isDetectedController.value = false;
+      }
+    });
+  }
 
   Future<void> pickImageFromGallery() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -106,20 +132,21 @@ void _onDetectBarcode(BarcodeCapture barcode) {
   }
 
   late MobileScannerController controller;
+  late ValueNotifier<bool> isDetectedController;
   late final ImagePicker _picker;
-  late bool isDetected;
 
   @override
   void initState() {
     super.initState();
     controller = MobileScannerController();
+    isDetectedController = ValueNotifier(false);
     _picker = ImagePicker();
-    isDetected = false;
   }
 
   @override
   void dispose() {
-    super.dispose();
     controller.dispose();
+    isDetectedController.dispose();
+    super.dispose();
   }
 }
