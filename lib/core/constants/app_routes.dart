@@ -5,6 +5,7 @@ abstract class AppRoutes {
   static const String scanScreenRoute = "/ScanScreen";
   static const String detailsScreen = "/DetailsScreen";
   static const String generateScreen = "/GenerateScreen";
+  static const String historyScreen = "/historyScreen";
   static const String wifiScreen = "/WifiScreen";
   static const String settingsScreen = "/SettingsScreen";
   

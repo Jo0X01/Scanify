@@ -4,6 +4,7 @@ import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
 import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
 import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
 import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
+import 'package:qrcode_scanner_app/core/widgets/custom_back_appbar.dart';
 import 'package:qrcode_scanner_app/features/generate/data/models/tool_data_model.dart';
 
 
@@ -82,11 +83,10 @@ class _GenerateScreenState extends State<GenerateScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.generate),
-        actions: [
-          SvgPicture.asset(AppIcons.settingsIcon, width: 30, height: 30),
-        ],
+      appBar: CustomBackAppBar(
+        title: AppStrings.generate,
+        hasBack: false,
+        addSettings: true,
       ),
       body: Container(
         alignment: Alignment.topCenter,

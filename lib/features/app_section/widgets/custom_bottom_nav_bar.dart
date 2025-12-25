@@ -10,7 +10,7 @@ class CustomBottomNavBar extends StatelessWidget {
     super.key,
     required this.currentIndex,
     required this.onTap,
-    required this.onCenterTapped
+    required this.onCenterTapped,
   });
 
   final int currentIndex;
@@ -24,22 +24,21 @@ class CustomBottomNavBar extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Container(
-            height: MediaQuery.of(context).size.height / 11,
-            margin: const EdgeInsets.only(left: 40, right: 40, bottom: 33),
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+            height: MediaQuery.of(context).size.height / 10,
+            // margin: const EdgeInsets.only(left: 40, right: 40, bottom: 33),
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             alignment: Alignment.bottomCenter,
             decoration: const BoxDecoration(
               color: AppColors.tabBackgroundColor,
-              borderRadius: BorderRadius.all(Radius.circular(6)),
+              border: Border(
+                top: BorderSide(color: AppColors.secondary, width: 2),
+              ),
               boxShadow: [
-                BoxShadow(
-                  color: Color(0x60000000),
-                  blurStyle: BlurStyle.outer,
-                ),
+                BoxShadow(color: Color(0x60000000), blurStyle: BlurStyle.outer),
               ],
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 _NavItem(
                   iconPath: AppIcons.generateIcon,
@@ -48,6 +47,7 @@ class CustomBottomNavBar extends StatelessWidget {
                   isSelected: currentIndex == 0,
                   onTap: () => onTap(0),
                 ),
+                Spacer(),
                 _NavItem(
                   iconPath: AppIcons.historyIcon,
                   selectedIconPath: AppIcons.historyIcon,
@@ -59,7 +59,7 @@ class CustomBottomNavBar extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: -30,
+            top: -35,
             left: 0,
             right: 0,
             child: DeferPointer(
@@ -69,7 +69,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 onTap: () {
                   onTap(1);
                   onCenterTapped();
-                }
+                },
               ),
             ),
           ),
@@ -102,8 +102,7 @@ class _NavItem extends StatelessWidget {
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        // spacing: 8,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 0),
@@ -156,15 +155,15 @@ class _CenterNavItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 60,
-        height: 60,
+        width: 70,
+        height: 70,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: AppColors.secondary,
           shape: BoxShape.circle,
           boxShadow: [BoxShadow(color: AppColors.secondary, blurRadius: 15)],
         ),
-        child: SvgPicture.asset(iconPath, width: 35, height: 35),
+        child: SvgPicture.asset(iconPath, width: 40, height: 40),
       ),
     );
   }
