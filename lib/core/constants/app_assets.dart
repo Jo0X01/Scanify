@@ -9,6 +9,9 @@ abstract class AppIcons {
   static const String copyIcon = 'assets/icons/copy-icon.svg';
   static const String shareIcon = 'assets/icons/share-icon.svg';
   static const String saveIcon = 'assets/icons/save-icon.svg';
+  static const String trashIcon = "assets/icons/trash-icon.svg";
+  static const String appIcon = "assets/icons/app-icon.svg";
+  static const String emptyIcon = "assets/icons/empty-icon.svg";
 
   static const String businessIcon = 'assets/icons/business-icon.svg';
   static const String contactIcon = 'assets/icons/contact-icon.svg';

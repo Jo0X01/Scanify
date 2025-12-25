@@ -9,6 +9,9 @@ import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
 import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
 import 'package:qrcode_scanner_app/core/dialogs/app_dialogs.dart';
 import 'package:qrcode_scanner_app/core/dialogs/app_toasts.dart';
+import 'package:qrcode_scanner_app/core/models/qrcode_model.dart';
+import 'package:qrcode_scanner_app/core/utils/app_helpers.dart';
+import 'package:qrcode_scanner_app/core/utils/app_hive.dart';
 import 'package:qrcode_scanner_app/core/widgets/custom_back_appbar.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
@@ -25,7 +28,7 @@ class DetailsScreen extends StatefulWidget {
 class _DetailsScreenState extends State<DetailsScreen> {
   @override
   Widget build(BuildContext context) {
-    final qrData = ModalRoute.of(context)!.settings.arguments as String;
+    qrData = ModalRoute.of(context)!.settings.arguments as HistoryQRCodeModel;
     return Scaffold(
       appBar: CustomBackAppBar(title: AppStrings.details),
       body: Column(
@@ -42,23 +45,23 @@ class _DetailsScreenState extends State<DetailsScreen> {
             child: Column(
               spacing: 20,
               children: [
-                Text(
-                  qrData,
-                  style: Theme.of(context).textTheme.headlineSmall,
+                GestureDetector(
+                  onTap: _copyTextToClipboard,
+                  child: Text(
+                    qrData.data!,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                 ),
-                Divider(height: 2,thickness: 3,color: AppColors.iconColor,),
+                Divider(height: 2, thickness: 3, color: AppColors.iconColor),
                 Screenshot(
                   controller: _saveController,
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border.all(
-                        color: AppColors.secondary,
-                        width: 5,
-                      ),
+                      border: Border.all(color: AppColors.secondary, width: 5),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: QrImageView(
-                      data: qrData,
+                      data: qrData.data!,
                       size: 220,
                       embeddedImage: AssetImage(AppImages.appLogo),
                       backgroundColor: AppColors.background,
@@ -67,6 +70,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     ),
                   ),
                 ),
+                Divider(height: 2, thickness: 3, color: AppColors.iconColor),
+                Text("Capture Date: ${AppHelpers.getCleanDate(qrData.date)}"),
               ],
             ),
           ),
@@ -74,18 +79,17 @@ class _DetailsScreenState extends State<DetailsScreen> {
             clipBehavior: Clip.none,
             spacing: 10,
             children: [
-              _actionButton(AppIcons.shareIcon, AppStrings.share,
-                  onTap: () => _share(qrData)),
+              _actionButton(
+                AppIcons.shareIcon,
+                AppStrings.share,
+                onTap: _share,
+              ),
               _actionButton(
                 AppIcons.copyIcon,
                 AppStrings.copy,
-                onTap: () => _copyToClipboard(qrData),
+                onTap: _copyTextToClipboard,
               ),
-              _actionButton(
-                AppIcons.saveIcon,
-                AppStrings.save,
-                onTap: () => _save(qrData),
-              ),
+              _actionButton(AppIcons.saveIcon, AppStrings.save, onTap: _save),
             ],
           ),
         ],
@@ -128,40 +132,51 @@ class _DetailsScreenState extends State<DetailsScreen> {
     );
   }
 
-  void _copyToClipboard(String data) async {
+  void _copyTextToClipboard() async {
     AppDialogs.showSnackBar(context, "Copying...");
-    await Clipboard.setData(ClipboardData(text: data));
+    await Clipboard.setData(ClipboardData(text: qrData.data!));
     AppDialogs.showSnackBar(context, "Saved to clipboard");
   }
 
-  void _share(String data) async {
+  void _share() async {
     AppDialogs.showSnackBar(context, "Sharing...");
-    try{
+    try {
       final tempDir = await getTemporaryDirectory();
-      final image = await _saveController.captureAndSave(tempDir.path,fileName: AppStrings.tempShareQRFileName);
+      final image = await _saveController.captureAndSave(
+        tempDir.path,
+        fileName: AppStrings.tempShareQRFileName,
+      );
       final xFile = XFile(image!);
-      final result = await SharePlus.instance.share(ShareParams(files: [xFile]));
-      if(result.status == ShareResultStatus.success){
+      final result = await SharePlus.instance.share(
+        ShareParams(files: [xFile]),
+      );
+      if (result.status == ShareResultStatus.success) {
         AppDialogs.showSnackBar(context, "Done");
       }
-    }catch(e){
-      AppToast.warn(context,title: "Error",description: e.toString());
+    } catch (e) {
+      AppToast.warn(context, title: "Error", description: e.toString());
     }
   }
 
-  void _save(String data) async {
+  void _save() async {
     AppDialogs.showSnackBar(context, "Saving...");
-    await _saveController.captureAndSave(AppStrings.cameraPath);
-    AppDialogs.showSnackBar(context, "Saved to: ${AppStrings.cameraPath}");
+    final path = await _saveController.captureAndSave(AppStrings.cameraPath);
+    AppDialogs.showSnackBar(context, "Saved to: $path");
   }
 
   late final ScreenshotController _saveController;
   late final int _defaultQRCodeVersion;
+  late final HistoryQRCodeModel qrData;
   @override
   void initState() {
     super.initState();
     _saveController = ScreenshotController();
-    _defaultQRCodeVersion = QrVersions.isSupportedVersion(7) ? 7 : QrVersions.auto;
+    _defaultQRCodeVersion = QrVersions.isSupportedVersion(7)
+        ? 7
+        : QrVersions.auto;
+    WidgetsBinding.instance.addPostFrameCallback((callback) {
+      AppHiveUtils.addQRCode(qrData);
+    });
   }
 
   @override
