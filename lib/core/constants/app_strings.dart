@@ -1,4 +1,8 @@
 abstract class AppStrings {
+  static const appVersion = '1.0.0';
+
+
+  
   static const String generate = 'Generate QR';
   static const String history = 'History';
   static const String generateQRCode = "Generate QR Code";
@@ -6,6 +10,7 @@ abstract class AppStrings {
   static const String share = "Share";
   static const String copy = "Copy";
   static const String save = "Save";
+  static const String settings = "Settings";
 
   static const String noBarCodeFoundInImageError = 'No Barcode/QRCode found in selected image';
   static const String cameraPath = "/storage/emulated/0/DCIM/QRCodeScanner/";

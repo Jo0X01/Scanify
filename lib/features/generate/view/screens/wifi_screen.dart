@@ -4,7 +4,7 @@ import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
 import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
 import 'package:qrcode_scanner_app/core/utils/app_helpers.dart';
 import 'package:qrcode_scanner_app/core/utils/validator.dart';
-import 'package:qrcode_scanner_app/core/widgets/text_form_field_with_label_custom_widget.dart';
+import 'package:qrcode_scanner_app/shared/widgets/text_form_field_with_label_custom_widget.dart';
 import 'package:qrcode_scanner_app/features/generate/view/widgets/generate_screen_form_custom_widget.dart';
 
 class WifiScreen extends StatefulWidget {
@@ -75,10 +75,9 @@ class _WifiScreenState extends State<WifiScreen> {
 
   void _onQRGenerating() {
     if (wifiFormKey.currentState?.validate() ?? false) {
-      AppRoutes.navigateTo(
+      AppRoutes.replaceWith(
         context,
         AppRoutes.detailsScreen,
-        replacement: true,
         arguments: AppHelpers.fixQRString(
           AppStrings.wifiQRPattern, {
             "S": wifiNameController.text,

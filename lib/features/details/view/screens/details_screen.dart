@@ -1,191 +1,172 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
-import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
 import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
 import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
 import 'package:qrcode_scanner_app/core/dialogs/app_dialogs.dart';
 import 'package:qrcode_scanner_app/core/dialogs/app_toasts.dart';
 import 'package:qrcode_scanner_app/core/models/qrcode_model.dart';
-import 'package:qrcode_scanner_app/core/utils/app_helpers.dart';
-import 'package:qrcode_scanner_app/core/utils/app_hive.dart';
-import 'package:qrcode_scanner_app/core/widgets/custom_back_appbar.dart';
+import 'package:qrcode_scanner_app/core/services/hive_service.dart';
+import 'package:qrcode_scanner_app/features/details/view/widgets/action_buttom_custom_widget.dart';
+import 'package:qrcode_scanner_app/features/details/view/widgets/qr_code_box_custom_widget.dart';
+import 'package:qrcode_scanner_app/shared/widgets/custom_back_appbar.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 
 class DetailsScreen extends StatefulWidget {
-  const DetailsScreen({super.key});
-
+  const DetailsScreen({super.key, required this.qrData});
   static const String routeName = AppRoutes.detailsScreen;
+  final HistoryQRCodeModel? qrData;
 
   @override
   State<DetailsScreen> createState() => _DetailsScreenState();
 }
 
 class _DetailsScreenState extends State<DetailsScreen> {
+  final ScreenshotController _saveController = ScreenshotController();
+
+  HistoryQRCodeModel? get _qrData => widget.qrData;
+
+  @override
+  void initState() {
+    super.initState();
+    _persistIfNeeded();
+  }
+
+  void _persistIfNeeded() {
+    final data = _qrData;
+    if (data == null || data.id == null) return;
+    HiveService.put<HistoryQRCodeModel>(data.id!, data);
+  }
+
   @override
   Widget build(BuildContext context) {
-    qrData = ModalRoute.of(context)!.settings.arguments as HistoryQRCodeModel;
+    if (_qrData == null) {
+      return Scaffold(
+        appBar: CustomBackAppBar(title: AppStrings.details),
+        body: Center(
+          child: Text(
+            'No data provided.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+      );
+    }
+
+    final mq = MediaQuery.of(context);
+    final screenW = mq.size.width;
+    final screenH = mq.size.height;
+    final isTablet = screenW >= 600;
+
+    final hPadding = screenW * 0.06;
+    final cardRadius = isTablet ? 20.0 : 16.0;
+    final qrSize = (screenW * 0.52).clamp(160.0, 280.0);
+    final btnSize = (screenW * 0.14).clamp(50.0, 72.0);
+    final btnPad = btnSize * 0.22;
+
     return Scaffold(
       appBar: CustomBackAppBar(title: AppStrings.details),
-      body: Column(
-        spacing: 10,
-        children: [
-          Container(
-            width: double.maxFinite,
-            margin: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 25),
-            decoration: BoxDecoration(
-              color: AppColors.tabBackgroundColor,
-              borderRadius: BorderRadius.circular(10),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.only(
+          left: hPadding,
+          right: hPadding,
+          top: screenH * 0.02,
+          bottom: screenH * 0.05,
+        ),
+        child: Column(
+          spacing: screenH * 0.025,
+          children: [
+            QrCodeBoxCustomWidget(
+              cardRadius: cardRadius,
+              qrSize: qrSize,
+              hPadding: hPadding,
+              qrData: _qrData!,
+              onCopy: _copyTextToClipboard,
+              saveController: _saveController,
             ),
-            child: Column(
-              spacing: 20,
-              children: [
-                GestureDetector(
-                  onTap: _copyTextToClipboard,
-                  child: Text(
-                    qrData.data!,
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                ),
-                Divider(height: 2, thickness: 3, color: AppColors.iconColor),
-                Screenshot(
-                  controller: _saveController,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.secondary, width: 5),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: QrImageView(
-                      data: qrData.data!,
-                      size: 220,
-                      embeddedImage: AssetImage(AppImages.appLogo),
-                      backgroundColor: AppColors.background,
-                      version: _defaultQRCodeVersion,
-                      errorCorrectionLevel: QrErrorCorrectLevel.M,
-                    ),
-                  ),
-                ),
-                Divider(height: 2, thickness: 3, color: AppColors.iconColor),
-                Text("Capture Date: ${AppHelpers.getCleanDate(qrData.date)}"),
-              ],
+            _buildActionButtons(
+              context,
+              btnSize: btnSize,
+              btnPad: btnPad,
+              isTablet: isTablet,
             ),
-          ),
-          Wrap(
-            clipBehavior: Clip.none,
-            spacing: 10,
-            children: [
-              _actionButton(
-                AppIcons.shareIcon,
-                AppStrings.share,
-                onTap: _share,
-              ),
-              _actionButton(
-                AppIcons.copyIcon,
-                AppStrings.copy,
-                onTap: _copyTextToClipboard,
-              ),
-              _actionButton(AppIcons.saveIcon, AppStrings.save, onTap: _save),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _actionButton(
-    String icon,
-    String actionTitle, {
-    void Function()? onTap,
+  Widget _buildActionButtons(
+    BuildContext context, {
+    required double btnSize,
+    required double btnPad,
+    required bool isTablet,
   }) {
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: onTap,
-          child: Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: AppColors.secondary,
-              borderRadius: BorderRadius.circular(10),
+    final buttons = [
+      (AppIcons.shareIcon, AppStrings.share, _share),
+      (AppIcons.copyIcon, AppStrings.copy, _copyTextToClipboard),
+      (AppIcons.saveIcon, AppStrings.save, _save),
+    ];
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: buttons
+          .map(
+            (b) => ActionButtonCustomWidget(
+              icon: b.$1,
+              label: b.$2,
+              onTap: b.$3,
+              size: btnSize,
+              padding: btnPad,
             ),
-            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-            padding: EdgeInsets.all(10),
-            child: SvgPicture.asset(
-              icon,
-              width: 24,
-              height: 24,
-              fit: BoxFit.contain,
-              colorFilter: ColorFilter.mode(
-                AppColors.tabBackgroundColor,
-                BlendMode.srcIn,
-              ),
-            ),
-          ),
-        ),
-        Text(actionTitle),
-      ],
+          )
+          .toList(),
     );
   }
 
   void _copyTextToClipboard() async {
-    AppDialogs.showSnackBar(context, "Copying...");
-    await Clipboard.setData(ClipboardData(text: qrData.data!));
-    AppDialogs.showSnackBar(context, "Saved to clipboard");
+    await Clipboard.setData(ClipboardData(text: _qrData!.data!));
+    if (mounted) AppDialogs.showSnackBar(context, 'Copied to clipboard');
   }
 
   void _share() async {
-    AppDialogs.showSnackBar(context, "Sharing...");
+    AppDialogs.showSnackBar(context, 'Sharing...');
     try {
       final tempDir = await getTemporaryDirectory();
       final image = await _saveController.captureAndSave(
         tempDir.path,
         fileName: AppStrings.tempShareQRFileName,
       );
-      final xFile = XFile(image!);
+      if (image == null) throw Exception('Failed to capture QR image');
+
       final result = await SharePlus.instance.share(
-        ShareParams(files: [xFile]),
+        ShareParams(files: [XFile(image)]),
       );
-      if (result.status == ShareResultStatus.success) {
-        AppDialogs.showSnackBar(context, "Done");
+      if (mounted && result.status == ShareResultStatus.success) {
+        AppDialogs.showSnackBar(context, 'Shared successfully');
       }
     } catch (e) {
-      AppToast.warn(context, title: "Error", description: e.toString());
+      if (mounted) {
+        AppToast.warn(context, title: 'Error', description: e.toString());
+      }
     }
   }
 
   void _save() async {
-    AppDialogs.showSnackBar(context, "Saving...");
-    final path = await _saveController.captureAndSave(AppStrings.cameraPath);
-    AppDialogs.showSnackBar(context, "Saved to: $path");
-  }
-
-  late final ScreenshotController _saveController;
-  late final int _defaultQRCodeVersion;
-  late final HistoryQRCodeModel qrData;
-  @override
-  void initState() {
-    super.initState();
-    _saveController = ScreenshotController();
-    _defaultQRCodeVersion = QrVersions.isSupportedVersion(7)
-        ? 7
-        : QrVersions.auto;
-    WidgetsBinding.instance.addPostFrameCallback((callback) {
-      AppHiveUtils.addQRCode(qrData);
-    });
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
+    AppDialogs.showSnackBar(context, 'Saving...');
+    try {
+      final path = await _saveController.captureAndSave(AppStrings.cameraPath);
+      if (mounted) {
+        AppDialogs.showSnackBar(
+          context,
+          path != null ? 'Saved to: $path' : 'Save failed',
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        AppToast.warn(context, title: 'Save Error', description: e.toString());
+      }
+    }
   }
 }

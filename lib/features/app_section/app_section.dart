@@ -15,30 +15,30 @@ class QRCodeScannerApp extends StatefulWidget {
 
 class _QRCodeScannerAppState extends State<QRCodeScannerApp> {
   int _currentIndex = 1;
-  late final ScanScreen scanScreen;
+
+  late final ScanScreen _scanScreen;
+  late final List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
-    scanScreen = ScanScreen();
+    _scanScreen = ScanScreen();
+    _screens = [GenerateScreen(), _scanScreen, HistoryScreen()];
   }
-
-  List<Widget> get screens => [
-      GenerateScreen(),
-      scanScreen,
-      HistoryScreen()
-    ];
-  
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      bottom: false,
       child: Scaffold(
         extendBody: true,
-        body: screens[_currentIndex],
+        body: IndexedStack(index: _currentIndex, children: _screens),
         bottomNavigationBar: CustomBottomNavBar(
           currentIndex: _currentIndex,
-          onCenterTapped: () => scanScreen.captureTrigger.value = true,
+          onCenterTapped: () {
+            // _scanScreen
+            // _scanScreen.captureTrigger.value = true;
+          },
           onTap: (index) => setState(() => _currentIndex = index),
         ),
       ),

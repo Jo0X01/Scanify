@@ -7,14 +7,11 @@ class ToolBarData {
   final Function()? onTap;
   bool isSelected = false;
   final bool callDefaultOnTap;
-  ToolBarData({required this.icon,this.onTap,this.callDefaultOnTap = true});
+  ToolBarData({required this.icon, this.onTap, this.callDefaultOnTap = true});
 }
 
 class ToolBarCustomWidget extends StatefulWidget {
-  const ToolBarCustomWidget({
-    required this.tools,
-    super.key
-  });
+  const ToolBarCustomWidget({required this.tools, super.key});
   final List<ToolBarData> tools;
 
   @override
@@ -34,14 +31,13 @@ class _ToolBarCustomWidgetState extends State<ToolBarCustomWidget> {
         margin: EdgeInsets.symmetric(horizontal: 45, vertical: 30),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: AppColors.tabBackgroundColor,
+          color: AppColors.tabBackground,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: widget.tools.map((tool) => _toolIcon(
-            index: widget.tools.indexOf(tool),
-          )).toList(),
-          
+          children: widget.tools
+              .map((tool) => _toolIcon(index: widget.tools.indexOf(tool)))
+              .toList(),
         ),
       ),
     );
@@ -52,7 +48,7 @@ class _ToolBarCustomWidgetState extends State<ToolBarCustomWidget> {
 
     return GestureDetector(
       onTap: () {
-        if(tool.onTap != null){
+        if (tool.onTap != null) {
           tool.onTap!();
         }
         _defaultOnTap(index);
@@ -62,15 +58,16 @@ class _ToolBarCustomWidgetState extends State<ToolBarCustomWidget> {
         width: 25,
         height: 25,
         colorFilter: ColorFilter.mode(
-          tool.isSelected ? AppColors.orange : AppColors.iconColor,
+          tool.isSelected ? Colors.orange : AppColors.iconColor,
           BlendMode.srcIn,
         ),
       ),
     );
   }
-  void _defaultOnTap(int index){
+
+  void _defaultOnTap(int index) {
     setState(() {
-      if(widget.tools[index].callDefaultOnTap){
+      if (widget.tools[index].callDefaultOnTap) {
         widget.tools[index].isSelected = !widget.tools[index].isSelected;
       }
     });

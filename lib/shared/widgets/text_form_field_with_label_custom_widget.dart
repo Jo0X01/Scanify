@@ -36,14 +36,14 @@ class _TextFormFieldWithLabelCustomWidgetState extends State<TextFormFieldWithLa
         widget.labelText == null ? const SizedBox() : Text(widget.labelText!,style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          color: AppColors.onPrimary
+          // color: AppColors.onPrimary
         ),),
         SizedBox(height: widget.labelText == null ? 0 : 5,),
         TextFormField(
           style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w400,
-            color: AppColors.onPrimary,
+            // color: AppColors.onPrimary,
             overflow: TextOverflow.ellipsis,
           ),
           obscureText: widget.obscureText,

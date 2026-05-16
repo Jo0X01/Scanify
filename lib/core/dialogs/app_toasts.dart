@@ -21,21 +21,21 @@ abstract class AppToast {
       autoCloseDuration: const Duration(seconds: 3),
       progressBarTheme: ProgressIndicatorThemeData(
         color: type == ToastificationType.success
-            ? AppColors.green
+            ? Colors.green
             : type == ToastificationType.info
-            ? AppColors.blue
+            ? Colors.blue
             : type == ToastificationType.warning
-            ? AppColors.orange
-            : AppColors.red,
+            ? Colors.orange
+            : Colors.red,
       ),
       showProgressBar: true,
       backgroundColor: type == ToastificationType.success
-          ? AppColors.green
+          ? Colors.green
           : type == ToastificationType.info
-          ? AppColors.blue
+          ? Colors.blue
           : type == ToastificationType.warning
-          ? AppColors.orange
-          : AppColors.red,
+          ? Colors.orange
+          : Colors.red,
       foregroundColor: AppColors.surface,
     );
   }
