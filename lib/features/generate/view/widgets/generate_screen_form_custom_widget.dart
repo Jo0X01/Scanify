@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
-import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
 import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
-import 'package:qrcode_scanner_app/core/widgets/custom_back_appbar.dart';
+import 'package:qrcode_scanner_app/shared/widgets/custom_back_appbar.dart';
 
 class GenerateScreenFormCustomWidget extends StatelessWidget {
   const GenerateScreenFormCustomWidget({
@@ -30,10 +28,12 @@ class GenerateScreenFormCustomWidget extends StatelessWidget {
             margin: EdgeInsets.symmetric(horizontal: 46, vertical: 25),
             padding: EdgeInsets.symmetric(vertical: 35, horizontal: 24),
             decoration: BoxDecoration(
-              color: AppColors.tabBackgroundColor,
+              // color: AppColors.tabBackgroundColor,
               borderRadius: BorderRadius.circular(6),
               border: Border.symmetric(
-                horizontal: BorderSide(color: AppColors.secondary, width: 2),
+                horizontal: BorderSide(
+                  // color: AppColors.secondary,)
+                width: 2),
               ),
             ),
             child: Column(
@@ -44,16 +44,16 @@ class GenerateScreenFormCustomWidget extends StatelessWidget {
                   icon,
                   width: 60,
                   height: 60,
-                  colorFilter: ColorFilter.mode(
-                    AppColors.secondary,
-                    BlendMode.srcIn,
-                  ),
+                  // colorFilter: ColorFilter.mode(
+                  //   // AppColors.secondary,
+                  //   BlendMode.srcIn,
+                  // ),
                 ),
                 formChild,
                 MaterialButton(
                   onPressed: onTap,
-                  color: AppColors.secondary,
-                  textColor: AppColors.onSurface,
+                  // color: AppColors.secondary,
+                  // textColor: AppColors.onSurface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),
                   ),

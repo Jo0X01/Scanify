@@ -19,5 +19,4 @@ abstract class AppHelpers {
     );
     return "${date.hour}:${date.minute}, ${date.day}/${date.month}/${date.year}";
   }
-
 }

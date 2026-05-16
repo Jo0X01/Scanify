@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
-import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
 import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
 import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
-import 'package:qrcode_scanner_app/core/widgets/custom_back_appbar.dart';
+import 'package:qrcode_scanner_app/shared/widgets/custom_back_appbar.dart';
 import 'package:qrcode_scanner_app/features/generate/data/models/tool_data_model.dart';
 
 
@@ -110,7 +109,7 @@ class _GenerateScreenState extends State<GenerateScreen> {
         padding: EdgeInsets.only(top: 13),
         margin: EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 20),
         decoration: BoxDecoration(
-          border: BoxBorder.all(color: AppColors.gray),
+          border: BoxBorder.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Stack(

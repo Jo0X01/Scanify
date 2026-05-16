@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
-import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
 import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
 import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
 import 'package:qrcode_scanner_app/core/models/qrcode_model.dart';
+import 'package:qrcode_scanner_app/core/services/hive_service.dart';
 import 'package:qrcode_scanner_app/core/utils/app_helpers.dart';
-import 'package:qrcode_scanner_app/core/utils/app_hive.dart';
-import 'package:qrcode_scanner_app/core/widgets/custom_back_appbar.dart';
+import 'package:qrcode_scanner_app/shared/widgets/custom_back_appbar.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -19,6 +18,8 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
+  late List<HistoryQRCodeModel> _storedQRData = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,55 +29,49 @@ class _HistoryScreenState extends State<HistoryScreen> {
         addSettings: true,
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15,vertical: 5),
-        margin: EdgeInsets.only(left: 15,right: 15,bottom: 160),
-        decoration: BoxDecoration(
-          color: AppColors.tabBackgroundColor,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: storedQRData.isEmpty
-            ? Container(
-                alignment: Alignment.center,
-                margin: EdgeInsets.only(top: 60),
-                child: Column(
-                  spacing: 10,
-                  children: [
-                    SvgPicture.asset(
-                      AppIcons.emptyIcon,
-                      width: 120,
-                      height: 120,
-                    ),
-                    Text(
-                      "No QRCode Scanned/Generated",
-                      softWrap: true,
-                      overflow: TextOverflow.clip,
-                    ),
-                    Text(
-                      "Try to scan/generate",
-                      softWrap: true,
-                      overflow: TextOverflow.clip,
-                    ),
-                  ],
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+          margin: EdgeInsets.only(left: 15, right: 15, bottom: 160,top: 10),
+          decoration: BoxDecoration(
+            // color: AppColors.tabBackgroundColor,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: _storedQRData.isEmpty
+              ? _buildEmptyState()
+              : ListView.builder(
+                  itemCount: _storedQRData.length,
+                  itemBuilder: (context, index) => _qrItemCard(index),
                 ),
-              )
-            : ListView.builder(
-                itemCount: storedQRData.length,
-                itemBuilder: (context, index) => _qrItemCard(index),
-              ),
-      ),
+        ),
     );
   }
 
-  late List<HistoryQRCodeModel> storedQRData = [];
   @override
   void initState() {
     super.initState();
-    getData();
+    _refreshData();
   }
 
-  void getData() async {
-    storedQRData = await AppHiveUtils.getStoredQRs();
-    setState(() {});
+  Widget _buildEmptyState() {
+    return Container(
+      alignment: Alignment.center,
+      margin: EdgeInsets.only(top: 60),
+      child: Column(
+        spacing: 10,
+        children: [
+          SvgPicture.asset(AppIcons.emptyIcon, width: 120, height: 120),
+          Text(
+            "No QRCode Scanned/Generated",
+            softWrap: true,
+            overflow: TextOverflow.clip,
+          ),
+          Text(
+            "Try to scan/generate",
+            softWrap: true,
+            overflow: TextOverflow.clip,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _qrItemCard(int index) {
@@ -84,7 +79,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       onTap: () => AppRoutes.navigateTo(
         context,
         AppRoutes.detailsScreen,
-        arguments: storedQRData[index],
+        arguments: _storedQRData[index],
       ),
       child: Container(
         width: double.infinity,
@@ -92,19 +87,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
         margin: EdgeInsets.symmetric(vertical: 10),
         alignment: Alignment.centerLeft,
         decoration: BoxDecoration(
-          color: AppColors.tabBackgroundColor,
+          // color: AppColors.tabBackgroundColor,
           borderRadius: BorderRadius.circular(6),
           boxShadow: [
             BoxShadow(
-              color: AppColors.gray,
+              // color: AppColors.gray,
               blurRadius: 3,
               spreadRadius: 1.2,
               offset: Offset(0, 0),
-              blurStyle: BlurStyle.outer
-            )
-          ]
+              blurStyle: BlurStyle.outer,
+            ),
+          ],
         ),
-      
+
         child: Row(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -118,12 +113,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    storedQRData[index].data!,
+                    _storedQRData[index].data!,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.labelLarge,
                   ),
                   Text(
-                    storedQRData[index].type ?? "text",
+                    _storedQRData[index].type ?? "text",
                     style: Theme.of(context).textTheme.labelMedium,
                     textAlign: TextAlign.start,
                   ),
@@ -141,14 +136,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     AppIcons.trashIcon,
                     width: 24,
                     height: 24,
-                    colorFilter: ColorFilter.mode(
-                      AppColors.secondary,
-                      BlendMode.srcIn,
-                    ),
+                    // colorFilter: ColorFilter.mode(
+                    // AppColors.secondary,
+                    //   BlendMode.srcIn,
+                    // ),
                   ),
                 ),
                 Text(
-                  AppHelpers.getCleanDate(storedQRData[index].date),
+                  AppHelpers.getCleanDate(_storedQRData[index].date),
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
@@ -159,10 +154,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
+  Future<void> _refreshData() async {
+    final data = HiveService.getAll<HistoryQRCodeModel>();
+    setState(() {
+      _storedQRData = data;
+    });
+  }
+
   void _onDelete(int index) async {
-    final item = storedQRData[index];
-    if (await AppHiveUtils.removeQRCode(item.id)) {
-      getData();
+    final item = _storedQRData[index];
+    if (item.id != null && await HiveService.delete(item.id!)) {
+      await _refreshData();
     }
   }
 }

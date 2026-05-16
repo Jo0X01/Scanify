@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
-import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
 import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
 
 class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -14,11 +13,13 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool hasBack;
   final bool addSettings;
+  final double _height = 80;
+
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      toolbarHeight: 120,
+      toolbarHeight: _height,
       leading: null,
       automaticallyImplyLeading: false,
       title: Row(
@@ -32,7 +33,7 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
                 height: 40,
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppColors.tabBackgroundColor,
+                  // color: AppColors.tabBackgroundColor,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: SvgPicture.asset(
@@ -60,5 +61,5 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(80);
+  Size get preferredSize => Size.fromHeight(_height);
 }
