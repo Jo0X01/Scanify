@@ -8,6 +8,7 @@
 build/
 pubspec.lock
 
+
 # Android
 android/.gradle/
 android/.kotlin/
@@ -56,6 +57,8 @@ lib/generated_plugin_registrant.dart
 *.iws
 .DS_Store
 Thumbs.db
+*.log
+.metadata
 
 # Environment & secrets
 .env

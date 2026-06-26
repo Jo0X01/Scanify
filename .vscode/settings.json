@@ -8,8 +8,29 @@
     "**/flutter/ephemeral": true,
     "**/Flutter/ephemeral": true,
     "**/.symlinks": true,
-    "**/.plugin_symlinks": true
+    "**/.plugin_symlinks": true,
+    "ios": true,
+    ".idea": true,
+    ".dart_tool": true,
+    ".flutter-plugins-dependencies": true,
+    "analysis_options.yaml": true,
+    "pubspec.lock": true,
+    "qrcode_scanner_app.iml": true,
+    "README.md": true,
+    "build": true,
+    "android": true
   },
-  "hide-files.files": [],
-  "dart.flutterSdkPath": ".fvm/versions/3.38.5"
+  "hide-files.files": [
+    "ios",
+    ".idea",
+    ".dart_tool",
+    ".flutter-plugins-dependencies",
+    "analysis_options.yaml",
+    "pubspec.lock",
+    "qrcode_scanner_app.iml",
+    "README.md",
+    "build",
+    "android"
+  ],
+  "dart.flutterSdkPath": ".fvm/versions/3.38.5",
 }

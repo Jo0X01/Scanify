@@ -19,6 +19,10 @@ abstract class AppColors {
   // ═════════════════════════════════════════════════════════════════════════
   // DARK  (blue-tinted near-blacks)
   // ═════════════════════════════════════════════════════════════════════════
+
+  static const Color shadow = Color(0x1AFFFFFF);
+  static const Color lShadow = Color(0x1A000000);
+  
   static const Color background = Color(0xFF080810);
   static const Color surface = Color(0xFF0F0F1C);
   static const Color surfaceVariant = Color(0xFF17172A);
