@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
 import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
-import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
-import 'package:qrcode_scanner_app/core/models/qrcode_model.dart';
-import 'package:qrcode_scanner_app/core/services/hive_service.dart';
-import 'package:qrcode_scanner_app/core/utils/app_helpers.dart';
+import 'package:qrcode_scanner_app/core/enum/qr_source_type.dart';
+import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart';
+import 'package:qrcode_scanner_app/features/history/view/controller/history_controller.dart';
+import 'package:qrcode_scanner_app/features/history/view/widgets/history_empty_custom_widget.dart';
+import 'package:qrcode_scanner_app/shared/widgets/qr_item_box_custom_widget.dart';
 import 'package:qrcode_scanner_app/shared/widgets/custom_back_appbar.dart';
+import 'package:qrcode_scanner_app/shared/widgets/meta_text_custom_widget.dart';
+import 'package:qrcode_scanner_app/shared/widgets/search_bar_custom_widget.dart';
+import 'package:qrcode_scanner_app/shared/widgets/selected_filter_custom_widget.dart'
+    show SelectedFilterCustomWidget;
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
-
   static const String routeName = AppRoutes.historyScreen;
 
   @override
@@ -18,153 +20,165 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  late List<HistoryQRCodeModel> _storedQRData = [];
+  late final HistoryController _screenController;
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final mq = MediaQuery.of(context);
+    final bottomPadding = mq.padding.bottom;
+
     return Scaffold(
       appBar: CustomBackAppBar(
-        title: AppStrings.history,
+        kbHeight: mq.size.height / 14,
+        title: l.history,
         hasBack: false,
         addSettings: true,
       ),
-      body: Container(
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-          margin: EdgeInsets.only(left: 15, right: 15, bottom: 160,top: 10),
-          decoration: BoxDecoration(
-            // color: AppColors.tabBackgroundColor,
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: _storedQRData.isEmpty
-              ? _buildEmptyState()
-              : ListView.builder(
-                  itemCount: _storedQRData.length,
-                  itemBuilder: (context, index) => _qrItemCard(index),
+      body: ValueListenableBuilder(
+        valueListenable: _screenController.itemListener,
+        builder: (_, items, _) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 6,
+            children: [
+              SearchBarCustomWidget(
+                hintText: l.search,
+                enableFilter: true,
+                margin: const EdgeInsets.only(top: 10),
+                controller: _screenController.searchInputController,
+                enabled:
+                    (!_screenController.isFilterCleared && items.isEmpty) ||
+                    _screenController.isFilterCleared && items.isEmpty ||
+                    items.isNotEmpty,
+                onChange: (_) => _screenController.loadData(),
+                onFilter: () {
+                  SelectedFilterCustomWidget.showSelectedDialog(
+                    context,
+                    title: l.filter,
+                    onApply: _screenController.setFilters,
+                    applyText: l.apply,
+                    selectedIndexes: {
+                      l.scanSource: _screenController.scanFilters,
+                      l.filterType: _screenController.typeFilters,
+                      l.filterFormat: _screenController.formatFilters
+                    },
+                    groupItems: {
+                      l.scanSource: QrSourceType.asMapLabel(l),
+                      l.filterType: XBarCodeType.asMapLabel(l),
+                      l.filterFormat: XBarCodeFormat.asMapLabel(l),
+                    },
+                  );
+                },
+              ),
+              if (!_screenController.isFilterCleared)
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    spacing: 8,
+                    children: [
+                      MetaTextCustomWidget(
+                        mode: MetaTextMode.tap,
+                        label: l.clear,
+                        isDestructive: true,
+                        leadingIcon: Icons.close_sharp,
+                        radius: 20,
+                        fontSize: 10,
+                        onToggle: (_) => _screenController.clearFilters(),
+                      ),
+                      ..._screenController.scanFilters.map(
+                        (tag) => MetaTextCustomWidget(
+                          label: tag.label(l),
+                          mode: MetaTextMode.tap,
+                          radius: 20,
+                          fontSize: 10,
+                          onToggle: (value) =>
+                              _screenController.removeFilter(tag),
+                        ),
+                      ),
+                      ..._screenController.typeFilters.map(
+                        (tag) => MetaTextCustomWidget(
+                          label: tag.label(l),
+                          mode: MetaTextMode.tap,
+                          radius: 20,
+                          fontSize: 10,
+                          onToggle: (value) =>
+                              _screenController.removeFilter(tag),
+                        ),
+                      ),
+                      ..._screenController.formatFilters.map(
+                        (tag) => MetaTextCustomWidget(
+                          label: tag.label(l),
+                          mode: MetaTextMode.tap,
+                          radius: 20,
+                          fontSize: 10,
+                          onToggle: (value) =>
+                              _screenController.removeFilter(tag),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-        ),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _screenController.loadData,
+                  child: items.isEmpty
+                      ? _screenController.isFilterCleared
+                            ? _noDataExist()
+                            : _noDataExistSearch()
+                      : ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.fromLTRB(
+                            16,
+                            12,
+                            16,
+                            bottomPadding + 20,
+                          ),
+
+                          itemCount: items.length,
+                          itemBuilder: (_, i) => QrItemBoxCustomWidget(
+                            item: items[i],
+                            onDelete: _screenController.deleteItem,
+                            onTap: () => _onItemClick(arg: [items[i]]),
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
+  }
+
+  Widget _noDataExist() {
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: const HistoryEmptyCustomWidget(),
+    );
+  }
+
+  Widget _noDataExistSearch() {
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: const HistoryEmptyCustomWidget(isSearch: true),
+    );
+  }
+
+  void _onItemClick({required Object? arg}) {
+    AppRoutes.navigateTo(context, AppRoutes.detailsScreen, arguments: arg);
   }
 
   @override
   void initState() {
     super.initState();
-    _refreshData();
+    _screenController = HistoryController();
   }
 
-  Widget _buildEmptyState() {
-    return Container(
-      alignment: Alignment.center,
-      margin: EdgeInsets.only(top: 60),
-      child: Column(
-        spacing: 10,
-        children: [
-          SvgPicture.asset(AppIcons.emptyIcon, width: 120, height: 120),
-          Text(
-            "No QRCode Scanned/Generated",
-            softWrap: true,
-            overflow: TextOverflow.clip,
-          ),
-          Text(
-            "Try to scan/generate",
-            softWrap: true,
-            overflow: TextOverflow.clip,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _qrItemCard(int index) {
-    return GestureDetector(
-      onTap: () => AppRoutes.navigateTo(
-        context,
-        AppRoutes.detailsScreen,
-        arguments: _storedQRData[index],
-      ),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        margin: EdgeInsets.symmetric(vertical: 10),
-        alignment: Alignment.centerLeft,
-        decoration: BoxDecoration(
-          // color: AppColors.tabBackgroundColor,
-          borderRadius: BorderRadius.circular(6),
-          boxShadow: [
-            BoxShadow(
-              // color: AppColors.gray,
-              blurRadius: 3,
-              spreadRadius: 1.2,
-              offset: Offset(0, 0),
-              blurStyle: BlurStyle.outer,
-            ),
-          ],
-        ),
-
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
-          spacing: 10,
-          children: [
-            SvgPicture.asset(AppIcons.appIcon, width: 36, height: 36),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _storedQRData[index].data!,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.labelLarge,
-                  ),
-                  Text(
-                    _storedQRData[index].type ?? "text",
-                    style: Theme.of(context).textTheme.labelMedium,
-                    textAlign: TextAlign.start,
-                  ),
-                ],
-              ),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              spacing: 10,
-              children: [
-                GestureDetector(
-                  onTap: () => _onDelete(index),
-                  child: SvgPicture.asset(
-                    AppIcons.trashIcon,
-                    width: 24,
-                    height: 24,
-                    // colorFilter: ColorFilter.mode(
-                    // AppColors.secondary,
-                    //   BlendMode.srcIn,
-                    // ),
-                  ),
-                ),
-                Text(
-                  AppHelpers.getCleanDate(_storedQRData[index].date),
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _refreshData() async {
-    final data = HiveService.getAll<HistoryQRCodeModel>();
-    setState(() {
-      _storedQRData = data;
-    });
-  }
-
-  void _onDelete(int index) async {
-    final item = _storedQRData[index];
-    if (item.id != null && await HiveService.delete(item.id!)) {
-      await _refreshData();
-    }
+  @override
+  void dispose() {
+    _screenController.dispose();
+    super.dispose();
   }
 }

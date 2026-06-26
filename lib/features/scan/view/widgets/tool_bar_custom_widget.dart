@@ -21,24 +21,21 @@ class ToolBarCustomWidget extends StatefulWidget {
 class _ToolBarCustomWidgetState extends State<ToolBarCustomWidget> {
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      top: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-        alignment: Alignment.topCenter,
-        padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-        margin: EdgeInsets.symmetric(horizontal: 45, vertical: 30),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: AppColors.tabBackground,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: widget.tools
-              .map((tool) => _toolIcon(index: widget.tools.indexOf(tool)))
-              .toList(),
-        ),
+    final w = MediaQuery.of(context).size.width;
+    return Container(
+      alignment: Alignment.center,
+      width: w / 0.80,
+      padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+      margin: EdgeInsets.symmetric(horizontal: 60, vertical: 30),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: AppColors.tabBackground,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: widget.tools
+            .map((tool) => _toolIcon(index: widget.tools.indexOf(tool)))
+            .toList(),
       ),
     );
   }
@@ -48,10 +45,11 @@ class _ToolBarCustomWidgetState extends State<ToolBarCustomWidget> {
 
     return GestureDetector(
       onTap: () {
-        if (tool.onTap != null) {
-          tool.onTap!();
+        tool.onTap?.call();
+        if (widget.tools[index].callDefaultOnTap) {
+          widget.tools[index].isSelected = !widget.tools[index].isSelected;
+          setState(() {});
         }
-        _defaultOnTap(index);
       },
       child: SvgPicture.asset(
         tool.icon,
@@ -63,13 +61,5 @@ class _ToolBarCustomWidgetState extends State<ToolBarCustomWidget> {
         ),
       ),
     );
-  }
-
-  void _defaultOnTap(int index) {
-    setState(() {
-      if (widget.tools[index].callDefaultOnTap) {
-        widget.tools[index].isSelected = !widget.tools[index].isSelected;
-      }
-    });
   }
 }

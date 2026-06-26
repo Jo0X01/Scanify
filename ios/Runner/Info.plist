@@ -59,5 +59,7 @@
     <true/>
     <key>UIStatusBarHidden</key>
     <false/>
-  </dict>
+  	<key>NSUserNotificationsUsageDescription</key>
+	<string>$(PRODUCT_NAME) requires send push notifications</string>
+</dict>
 </plist>

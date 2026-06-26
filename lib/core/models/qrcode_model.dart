@@ -1,74 +1,107 @@
 import 'package:hive/hive.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:qrcode_scanner_app/core/constants/app_helpers.dart'
+    show AppHelpers;
+import 'package:qrcode_scanner_app/core/enum/qr_error_correction.dart'
+    show QrErrorCorrectionLevel;
+import 'package:qrcode_scanner_app/core/enum/qr_source_type.dart';
 
-class HistoryQRCodeModel extends HiveObject {
+class QRCodeModel extends HiveObject {
   final String? id;
   final String? data;
+  final String? typeStr;
+  final String? formatStr;
+  final QrErrorCorrectionLevel? eccLevel;
   final int? date;
-  final String? type;
+  final QrSourceType? source;
+  final BarcodeFormat? format;
+  final BarcodeType? type;
   bool isFavorite;
 
-  HistoryQRCodeModel({
+  QRCodeModel({
     this.id,
     this.data,
     this.date,
-    this.type,
+    this.typeStr,
+    this.formatStr,
     this.isFavorite = false,
+    this.source,
+    this.format,
+    this.type,
+    this.eccLevel,
   });
 
-  HistoryQRCodeModel copyWith({
+  factory QRCodeModel.fromData(
+    String? raw, {
+    required BarcodeType type,
+    required BarcodeFormat format,
+    QrSourceType source = QrSourceType.scan,
+  }) {
+    return QRCodeModel(
+      id: raw != null ? AppHelpers.generateMd5(raw) : null,
+      data: raw,
+      date: DateTime.now().millisecondsSinceEpoch,
+      type: type,
+      typeStr: type.name,
+      format: format,
+      formatStr: format.name,
+      source: source
+    );
+  }
+
+  factory QRCodeModel.fromBarcode(
+    Barcode code, [
+    QrSourceType source = QrSourceType.scan,
+  ]) {
+    final raw = code.rawValue;
+    return QRCodeModel(
+      id: raw != null ? AppHelpers.generateMd5(raw) : null,
+      data: raw,
+      date: DateTime.now().millisecondsSinceEpoch,
+      type: code.type,
+      typeStr: code.type.name,
+      format: code.format,
+      formatStr: code.format.name,
+      source: source
+    );
+  }
+
+  static List<QRCodeModel> fromBarcodes(
+    List<Barcode> codes,
+    QrSourceType source,
+  ) => codes.map((c) => QRCodeModel.fromBarcode(c, source)).toList();
+
+  QRCodeModel copyWith({
     String? id,
     String? data,
     int? date,
-    String? type,
+    String? typeStr,
+    String? formatStr,
     bool? isFavorite,
-  }) {
-    return HistoryQRCodeModel(
-      id: id ?? this.id,
-      data: data ?? this.data,
-      date: date ?? this.date,
-      type: type ?? this.type,
-      isFavorite: isFavorite ?? this.isFavorite,
-    );
-  }
+    QrSourceType? source,
+    BarcodeFormat? format,
+    BarcodeType? type,
+    QrErrorCorrectionLevel? eccLevel,
+  }) => QRCodeModel(
+    id: id ?? this.id,
+    data: data ?? this.data,
+    date: date ?? this.date,
+    typeStr: typeStr ?? this.typeStr,
+    formatStr: formatStr ?? this.formatStr,
+    isFavorite: isFavorite ?? this.isFavorite,
+    source: source ?? this.source,
+    format: format ?? this.format,
+    type: type ?? this.type,
+    eccLevel: eccLevel ?? this.eccLevel,
+  );
 
   @override
   String toString() =>
-      'HistoryQRCodeModel(id: $id, type: $type, date: $date, favorite: $isFavorite)';
-}
-
-class HistoryQRCodeModelAdapter extends TypeAdapter<HistoryQRCodeModel> {
-  @override
-  int get typeId => 0;
-
-  @override
-  HistoryQRCodeModel read(BinaryReader reader) {
-    final fieldCount = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < fieldCount; i++) reader.readByte(): reader.read(),
-    };
-
-    return HistoryQRCodeModel(
-      id: fields[0] as String?,
-      data: fields[1] as String?,
-      date: fields[2] as int?,
-      type: fields[3] as String?,
-      isFavorite: fields[4] as bool? ?? false
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, HistoryQRCodeModel obj) {
-    writer.writeByte(5); 
-    writer
-      ..writeByte(0)
-      ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.data)
-      ..writeByte(2)
-      ..write(obj.date)
-      ..writeByte(3)
-      ..write(obj.type)
-      ..writeByte(4)
-      ..write(obj.isFavorite);
-  }
+      'QRCodeModel('
+      'id: $id, '
+      'type: $type, '
+      'format: $format, '
+      'source: $source, '
+      'date: $date, '
+      ')';
 }

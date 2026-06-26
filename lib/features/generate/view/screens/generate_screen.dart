@@ -1,137 +1,129 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
 import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
-import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
+import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart';
+import 'package:qrcode_scanner_app/features/generate/view/config/barcode_tool_config.dart'
+    show getBarcodeTool;
+import 'package:qrcode_scanner_app/features/generate/view/config/popular_tool_config.dart'
+    show getPopularTool;
+import 'package:qrcode_scanner_app/features/generate/view/config/social_tool_config.dart'
+    show getSocialTool;
+import 'package:qrcode_scanner_app/features/generate/view/config/tool_config.dart';
+import 'package:qrcode_scanner_app/features/generate/view/controller/generate_controller.dart'
+    show GenerateScreenController;
+import 'package:qrcode_scanner_app/features/generate/view/screens/template_screen.dart'
+    show TemplateScreen;
+import 'package:qrcode_scanner_app/features/generate/view/widgets/tool_icon_custom_widget.dart';
 import 'package:qrcode_scanner_app/shared/widgets/custom_back_appbar.dart';
-import 'package:qrcode_scanner_app/features/generate/data/models/tool_data_model.dart';
-
 
 class GenerateScreen extends StatefulWidget {
-  GenerateScreen({super.key});
+  const GenerateScreen({super.key});
   static const String routeName = AppRoutes.generateScreen;
-
-  final List<ToolDataModel> tools = [
-    ToolDataModel(
-      title: AppStrings.text,
-      icon: AppIcons.textIcon,
-      route: AppRoutes.textScreen,
-    ),
-    ToolDataModel(
-      title: AppStrings.website,
-      icon: AppIcons.websiteIcon,
-      route: AppRoutes.websiteScreen,
-    ),
-    ToolDataModel(
-      title: AppStrings.wifi,
-      icon: AppIcons.wifiIcon,
-      route: AppRoutes.wifiScreen,
-    ),
-    ToolDataModel(
-      title: AppStrings.event,
-      icon: AppIcons.eventIcon,
-      route: AppRoutes.eventScreen,
-    ),
-    ToolDataModel(
-      title: AppStrings.contact,
-      icon: AppIcons.contactIcon,
-      route: AppRoutes.contactScreen,
-    ),
-    ToolDataModel(
-      title: AppStrings.business,
-      icon: AppIcons.businessIcon,
-      route: AppRoutes.businessScreen,
-    ),
-    ToolDataModel(
-      title: AppStrings.location,
-      icon: AppIcons.locationIcon,
-      route: AppRoutes.locationScreen,
-    ),
-    ToolDataModel(
-      title: AppStrings.whatsapp,
-      icon: AppIcons.whatsappIcon,
-      route: AppRoutes.whatsappScreen,
-    ),
-    ToolDataModel(
-      title: AppStrings.email,
-      icon: AppIcons.emailIcon,
-      route: AppRoutes.emailScreen,
-    ),
-    ToolDataModel(
-      title: AppStrings.twitter,
-      icon: AppIcons.twitterIcon,
-      route: AppRoutes.twitterScreen,
-    ),
-    ToolDataModel(
-      title: AppStrings.instagram,
-      icon: AppIcons.instagramIcon,
-      route: AppRoutes.instagramScreen,
-    ),
-    ToolDataModel(
-      title: AppStrings.telephone,
-      icon: AppIcons.telephoneIcon,
-      route: AppRoutes.telephoneScreen,
-    ),
-  ];
 
   @override
   State<GenerateScreen> createState() => _GenerateScreenState();
 }
 
 class _GenerateScreenState extends State<GenerateScreen> {
+  final _screenController = GenerateScreenController();
+
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: CustomBackAppBar(
-        title: AppStrings.generate,
+        title: l.generateQRCode,
         hasBack: false,
         addSettings: true,
+        kbHeight: MediaQuery.of(context).size.height / 12,
       ),
-      body: Container(
-        alignment: Alignment.topCenter,
-        margin: EdgeInsets.only(bottom: 120),
-        child: SingleChildScrollView(
-          child: Wrap(
-            children: widget.tools.map((tool) => _clickableIcon(tool)).toList(),
-          ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 10,
+          children: [
+            _catBuilder(
+              context,
+              l,
+              title: l.popularCategory,
+              tools: _screenController.popularOnly
+                  .map((e) => getPopularTool(e))
+                  .toList(),
+            ),
+            _catBuilder(
+              context,
+              l,
+              title: l.socialCategory,
+              tools: _screenController.socialOnly
+                  .map((e) => getSocialTool(e))
+                  .toList(),
+            ),
+            _catBuilder(
+              context,
+              l,
+              title: l.barcodeCategory,
+              tools: _screenController.barcodeOnly
+                  .map((e) => getBarcodeTool(e))
+                  .toList(),
+            ),
+            SizedBox(height: 150),
+          ],
         ),
       ),
     );
   }
 
-  Widget _clickableIcon(ToolDataModel tool) {
-    return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, tool.route),
-      child: Container(
-        height: 95,
-        width: MediaQuery.of(context).size.width / 4 - 10,
-        alignment: Alignment.topCenter,
-        padding: EdgeInsets.only(top: 13),
-        margin: EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 20),
-        decoration: BoxDecoration(
-          border: BoxBorder.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            SvgPicture.asset(tool.icon, width: 40, height: 40),
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 50,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  tool.title,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12),
-                ),
-              ),
+  Widget _catBuilder(
+    BuildContext context,
+    AppLocalizations l, {
+    required List<ToolConfig> tools,
+    required String title,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
+          child: Text(
+            title,
+            textAlign: TextAlign.start,
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+              color: Theme.of(context).colorScheme.primary,
             ),
-          ],
+          ),
         ),
-      ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 8),
+          alignment: Alignment.topCenter,
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.start,
+            children: tools
+                .map((e) => iconBuilder(context, l: l, tool: e))
+                .toList(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget iconBuilder(
+    BuildContext context, {
+    required AppLocalizations l,
+    required ToolConfig tool,
+  }) {
+    return ToolIconCustomWidget(
+      title: tool.title(l),
+      icon: tool.icon,
+      onTap: () {
+        final controller = tool.buildController(l);
+        AppRoutes.navigate(
+          context,
+          TemplateScreen(
+            templateController: controller,
+            child: tool.buildTemplate(controller),
+          ),
+        );
+      },
     );
   }
 }

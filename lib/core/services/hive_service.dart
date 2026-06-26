@@ -1,18 +1,21 @@
+
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class HiveService {
-  const HiveService._();
+  HiveService._();
+  static final instance = HiveService._();
 
-  static const String _boxName =
+  final String _boxName =
       '102c2b93bfe65a2f45cda4af7288767428e120b9222d866539bddb5183b498a8';
-  static bool _initialized = false;
+  bool _initialized = false;
 
-  static Future<void> init({List<TypeAdapter>? adapters}) async {
+  Future<void> init({List<TypeAdapter>? adapters}) async {
     if (_initialized) return;
 
     try {
       await Hive.initFlutter();
+
       if (adapters != null) {
         for (final adapter in adapters) {
           if (!Hive.isAdapterRegistered(adapter.typeId)) {
@@ -20,19 +23,29 @@ class HiveService {
           }
         }
       }
+
       if (!Hive.isBoxOpen(_boxName)) {
-        await Hive.openBox(_boxName);
+        await Hive.openBox<dynamic>(_boxName);
       }
+
       _initialized = true;
       debugPrint('LocalDB initialized successfully');
     } catch (e, stackTrace) {
       debugPrint('LocalDB initialization failed: $e');
       debugPrintStack(stackTrace: stackTrace);
-      rethrow;
+      try {
+        await Hive.deleteBoxFromDisk(_boxName);
+        await Hive.openBox<dynamic>(_boxName);
+        _initialized = true;
+        debugPrint('LocalDB re-initialized after clearing corrupted data');
+      } catch (e2) {
+        debugPrint('LocalDB re-initialization failed: $e2');
+        rethrow;
+      }
     }
   }
 
-  static Box get _box {
+  Box get _box {
     if (!_initialized) {
       throw StateError(
         'HiveService is not initialized. Call HiveService.init() first.',
@@ -41,43 +54,58 @@ class HiveService {
     return Hive.box(_boxName);
   }
 
-  static ValueListenable<Box> get listenable => _box.listenable();
-  static Future<void> put<T>(String key, T value) async {
+  ValueListenable<Box> get listenable => _box.listenable();
+
+  Future<void> putAll<T>(Map<String, T> entries) async {
+    await _box.putAll(entries);
+  }
+
+  Future<void> put<T>(String? key, T? value) async {
+    if (value == null || key == null) return;
+    await _box.put(key, value);
+  }
+
+  Future<void> putIfAbsent<T>(String? key, T? value) async {
+    if (value == null || key == null) return;
     if (!_box.containsKey(key)) {
       await _box.put(key, value);
     }
   }
 
-  static T? get<T>(String key) {
+  T? get<T>(String key) {
     return _box.get(key) as T?;
   }
 
-  static List<T> getAll<T>() {
-    return _box.values.whereType<T>().toList();
+  List<T> getAll<T>([bool Function(T)? callback]) {
+    final result = _box.values.whereType<T>();
+    if(callback != null){
+      return result.where(callback).toList();
+    }
+    return result.toList();
   }
 
-  static Future<bool> delete(String key) async {
+  Future<bool> delete(String? key) async {
+    if (key == null) return false;
     if (_box.containsKey(key)) {
       await _box.delete(key);
       return true;
     }
-
     return false;
   }
 
-  static Future<void> deleteMany(List<String> keys) async {
+  Future<void> deleteMany(List<String> keys) async {
     await _box.deleteAll(keys);
   }
 
-  static Future<void> clear() async {
+  Future<void> clear() async {
     await _box.clear();
   }
 
-  static bool contains(String key) {
+  bool contains(String key) {
     return _box.containsKey(key);
   }
 
-  static Future<void> close() async {
+  Future<void> close() async {
     await Hive.close();
     _initialized = false;
   }

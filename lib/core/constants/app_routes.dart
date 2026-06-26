@@ -1,51 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode_scanner_app/features/app_section/app_section.dart';
-import 'package:qrcode_scanner_app/features/generate/view/screens/generate_screen.dart';
-import 'package:qrcode_scanner_app/features/generate/view/screens/wifi_screen.dart';
-import 'package:qrcode_scanner_app/features/history/view/screens/history_screen.dart';
-import 'package:qrcode_scanner_app/features/scan/view/screens/scan_screen.dart';
-import 'package:qrcode_scanner_app/features/settings/view/screens/settings_screen.dart';
 
 abstract class AppRoutes {
+  static final routeObserver = RouteObserver<ModalRoute<void>>();
+
   static const String appRoute = '/';
   static const String scanScreen = '/scan';
   static const String detailsScreen = '/details';
   static const String generateScreen = '/generate';
   static const String historyScreen = '/history';
   static const String settingsScreen = '/settings';
+  static const String templateScreen = '/generate-template';
 
-  static const String wifiScreen = '/generate/wifi';
-  static const String businessScreen = '/generate/business';
-  static const String contactScreen = '/generate/contact';
-  static const String textScreen = '/generate/text';
-  static const String twitterScreen = '/generate/twitter';
-  static const String websiteScreen = '/generate/website';
-  static const String whatsappScreen = '/generate/whatsapp';
-  static const String telephoneScreen = '/generate/telephone';
-  static const String locationScreen = '/generate/location';
-  static const String instagramScreen = '/generate/instagram';
-  static const String eventScreen = '/generate/event';
-  static const String emailScreen = '/generate/email';
+  static Future navigateToSettings(BuildContext context) {
+    return Navigator.of(context).pushNamed(AppRoutes.settingsScreen);
+  }
 
-  static final Map<String, WidgetBuilder> routes = {
-    appRoute: (_) => const QRCodeScannerApp(),
-    scanScreen: (_) => const ScanScreen(),
-    generateScreen: (_) => GenerateScreen(),
-    historyScreen: (_) => const HistoryScreen(),
-    settingsScreen: (_) => const SettingsScreen(),
-    wifiScreen: (_) => const WifiScreen(),
-    // businessScreen: (_) => const BusinessScreen(),
-    // contactScreen: (_) => const ContactScreen(),
-    // textScreen: (_) => const TextScreen(),
-    // twitterScreen: (_) => const TwitterScreen(),
-    // websiteScreen: (_) => const WebsiteScreen(),
-    // whatsappScreen: (_) => const WhatsAppScreen(),
-    // telephoneScreen: (_) => const TelephoneScreen(),
-    // locationScreen: (_) => const LocationScreen(),
-    // instagramScreen: (_) => const InstagramScreen(),
-    // eventScreen: (_) => const EventScreen(),
-    // emailScreen: (_) => const EmailScreen(),
-  };
+  static Route<dynamic>? pureNavigateRoute(Widget screen) {
+    return MaterialPageRoute(builder: (_) => screen);
+  }
+
+  static Future<T?> navigate<T extends Object?>(
+    BuildContext context,
+    Widget screen,
+  ) {
+    return Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => screen));
+  }
 
   static Future<T?> navigateTo<T>(
     BuildContext context,
@@ -71,5 +52,14 @@ abstract class AppRoutes {
 
   static void popUntil(BuildContext context, String routeName) {
     Navigator.of(context).popUntil(ModalRoute.withName(routeName));
+  }
+
+  static void registerObserver(RouteAware screen, BuildContext context) {
+    routeObserver.unsubscribe(screen);
+    routeObserver.subscribe(screen, ModalRoute.of(context)!);
+  }
+
+  static void unregisterObserver(RouteAware screen) {
+    routeObserver.unsubscribe(screen);
   }
 }
