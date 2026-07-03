@@ -128,7 +128,11 @@ class ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
     final models = await screenController.pickFromGallery();
     if (!mounted) return;
     _suppressNextPopNext = true;
-    AppDialogs.hideLoading(context); 
+    AppDialogs.hideLoading(context);
+    if (models == null) {
+      AppDialogs.showNotifiyToast(context, context.l.permissionRequired);
+      return;
+    }
     if (models.isNotEmpty) {
       await context.goToDetails(models);
       return;
@@ -155,7 +159,7 @@ class ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
       _suppressNextPopNext = false;
       return;
     }
-    await screenController.checkPermissions();
+    await screenController.applyPermissionStatus();
     screenController.resumeCamera();
   }
 
@@ -165,8 +169,8 @@ class ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed){
-      screenController.refreshPermissionStatus();
+    if (state == AppLifecycleState.resumed) {
+      screenController.applyPermissionStatus();
     }
   }
 
@@ -175,7 +179,9 @@ class ScanScreenState extends State<ScanScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     screenController = ScanController();
-    screenController.init();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      screenController.init();
+    });
   }
 
   @override

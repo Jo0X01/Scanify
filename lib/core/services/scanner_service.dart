@@ -25,12 +25,8 @@ class ScannerService {
   bool get isBarcodeEmpty => currentBarCode.isEmpty;
 
   Future<void> restartController() async {
-    await scannerController.stop().then((_) {
-      cameraState.value = CameraState.inactive;
-    });
-    await scannerController.start().then((_) {
-      cameraState.value = CameraState.active;
-    });
+    await stop();
+    await start();
   }
 
   Future<void> start() async {

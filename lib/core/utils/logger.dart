@@ -15,7 +15,6 @@ abstract class AppLogger {
   /// e.g. "AppLogger.e('Failed to load current location', e, st)".
   static void log(String context, Object error, [StackTrace? stackTrace]) {
     if (kReleaseMode) {
-      // TODO: send to Crashlytics / Sentry, e.g.:
       // FirebaseCrashlytics.instance.recordError(error, stackTrace, reason: context);
     }
     

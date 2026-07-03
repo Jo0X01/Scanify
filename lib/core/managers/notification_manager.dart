@@ -67,17 +67,16 @@ class NotificationManager {
     );
   }
 
-  Future<void> notifiySaved() async {
+  Future<void> notifiySaved([int? counter]) async {
     final context = RouteService.rootScaffoldMessengerKey.currentContext;
     if (context == null) return;
     await _notificationService.showNotification(
       id: NotificationIds.save,
       channelId: NotificationChannels.save,
-      title: context.l.notifSaveTitle,
+      title: context.l.notifSaveTitle + (counter != null ? "($counter)" : ""),
       body: context.l.notifSaveBody,
       ongoing: false,
       autoCancel: true,
     );
   }
-
 }

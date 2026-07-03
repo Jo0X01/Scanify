@@ -18,24 +18,15 @@ class ScanController {
   late final ValueNotifier<ScanState> screenState;
   late final PermissionService _perms;
 
-  void init() async {
-    await checkPermissions();
+  Future<void> init() async {
+    await applyPermissionStatus();
     ScannerManager.instance.addCameraListener(
       NotificationManager.instance.notifyCameraState,
     );
   }
 
-  Future<void> checkPermissions() async {
-    await _perms.requestRequiredPermissions();
-    await _applyPermissionStatus();
-  }
-
-  Future<void> refreshPermissionStatus() async {
-    await _applyPermissionStatus();
-  }
-
-  Future<void> _applyPermissionStatus() async {
-    if (!(await _perms.isRequiredGranted)) {
+  Future<void> applyPermissionStatus() async {
+    if (!(await _perms.isCameraGranted)) {
       screenState.value = ScanState.permission;
     } else {
       screenState.value = ScanState.normal;
@@ -88,18 +79,15 @@ class ScanController {
 
   void toggleTorch() => _scannerManager.toggleTorch();
 
-  Future<Set<QRCodeModel>> pickFromGallery() async {
+  Future<Set<QRCodeModel>?> pickFromGallery() async {
+    if (!(await _perms.isStorageGranted)) return null;
     _scannerManager.clearDetection();
-    await _scannerManager.stopDetection();
     await _scannerManager.turnTorchOff();
     final result = await _scannerManager.pickAndAnalyzeFromGal();
-    if (result.isEmpty) {
-      await _scannerManager.startDetection();
-    } else {
+    if (result.isNotEmpty) {
       await _scannerManager.stopDetection();
       await _scannerManager.turnTorchOff();
     }
     return result;
   }
-
 }

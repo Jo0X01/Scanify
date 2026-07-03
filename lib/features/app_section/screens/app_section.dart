@@ -10,6 +10,7 @@ import 'package:scanify/features/app_section/widgets/custom_bottom_nav_bar.dart'
 import 'package:scanify/features/generate/view/screens/generate_screen.dart';
 import 'package:scanify/features/history/view/screens/history_screen.dart';
 import 'package:scanify/features/scan/view/screens/scan_screen.dart';
+import 'package:scanify/shared/widgets/lazy_indexed_stack.dart';
 
 class AppSectionScreen extends StatefulWidget {
   const AppSectionScreen({super.key});
@@ -61,7 +62,7 @@ class _AppSectionScreenState extends State<AppSectionScreen> with RouteAware {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      body: IndexedStack(index: _currentIndex, children: screens),
+      body: LazyIndexedStack(index: _currentIndex, children: screens),
       bottomNavigationBar: ValueListenableBuilder(
         valueListenable: ScannerManager.instance.detectListener,
         builder: (context, value, child) {

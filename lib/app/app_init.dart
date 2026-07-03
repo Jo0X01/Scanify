@@ -1,3 +1,5 @@
+
+import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scanify/core/constants/notification_constants.dart';
 import 'package:scanify/core/models/qr_model_adapter.dart';
@@ -41,6 +43,7 @@ abstract class AppInit {
       );
       return true;
     } catch (e) {
+      debugPrint(e.toString());
       return false;
     }
   }

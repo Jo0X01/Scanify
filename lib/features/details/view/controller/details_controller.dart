@@ -41,7 +41,7 @@ class DetailsController {
   Future<void> saveToDB() async {
     if (_setting.enableHistory) {
       if (await ScannerManager.instance.saveQrModels(qrData)) {
-        NotificationManager.instance.notifiySaved();
+        NotificationManager.instance.notifiySaved(qrData.length);
       }
     }
   }

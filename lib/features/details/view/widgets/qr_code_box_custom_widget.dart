@@ -70,6 +70,7 @@ class QrCodeBoxCustomWidget extends StatelessWidget {
                   data: qrData.data ?? '',
                   errorCorrectLevel: qrVersion,
                   decoration: PrettyQrDecoration(
+                    // ignore: experimental_member_use
                     shape: PrettyQrShape.custom(
                       qrShape ?? const PrettyQrSmoothSymbol(),
                     ),

@@ -162,4 +162,10 @@ class PermissionService {
     requestIfNotGranted: true,
     checkIfAllGranted: true,
   );
+  Future<bool> get isStorageGranted => _permWorker(
+    perms: {_storage},
+    saveIfMiss: false,
+    requestIfNotGranted: true,
+    checkIfAllGranted: true,
+  );
 }
