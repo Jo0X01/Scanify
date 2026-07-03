@@ -1,168 +1,149 @@
 import 'package:defer_pointer/defer_pointer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
-import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
-import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
+import 'package:scanify/features/app_section/widgets/bottom_nav_item_custom_widget.dart';
+import 'package:scanify/features/app_section/widgets/center_nav_item_custom_widget.dart';
+
+const double _kNavBarMinHeight = 60.0;
+const double _kNavBarMaxHeight = 80.0;
+const double _kCenterBtnMin = 60.0;
+const double _kCenterBtnMax = 80.0;
+
+class NavBarItem {
+  final String iconPath;
+  final String label;
+  final int index;
+  final VoidCallback? onTap;
+
+  const NavBarItem({
+    required this.iconPath,
+    required this.label,
+    required this.index,
+    this.onTap,
+  });
+}
+
+class NavBarCenterItem {
+  final String iconPath;
+  final bool isActive;
+  final VoidCallback? onTap;
+  final int index;
+
+  const NavBarCenterItem({
+    required this.iconPath,
+    required this.index,
+    this.isActive = false,
+    this.onTap,
+  });
+}
 
 class CustomBottomNavBar extends StatelessWidget {
   const CustomBottomNavBar({
     super.key,
     required this.currentIndex,
     required this.onTap,
+    required this.menuItems,
+    required this.centerItem,
+    required this.animationActive,
   });
 
   final int currentIndex;
-  final Function(int) onTap;
+  final bool animationActive;
+  final void Function(int) onTap;
+  final List<NavBarItem> menuItems;
+  final NavBarCenterItem centerItem;
 
   @override
   Widget build(BuildContext context) {
+    final mq = MediaQuery.of(context);
+    final screenW = mq.size.width;
+    final bottomPadding = mq.padding.bottom;
+
+    final navBarHeight =
+        (_kNavBarMinHeight +
+                (screenW - 320) /
+                    (428 - 320) *
+                    (_kNavBarMaxHeight - _kNavBarMinHeight))
+            .clamp(_kNavBarMinHeight, _kNavBarMaxHeight);
+
+    final btnSize =
+        (_kCenterBtnMin +
+                (screenW - 320) /
+                    (428 - 320) *
+                    (_kCenterBtnMax - _kCenterBtnMin))
+            .clamp(_kCenterBtnMin, _kCenterBtnMax);
+
+    final halfBtn = btnSize / 2;
+
+    final theme = Theme.of(context);
     return DeferredPointerHandler(
       child: Stack(
         clipBehavior: Clip.none,
+        alignment: Alignment.bottomCenter,
         children: [
-          Container(
-            height: MediaQuery.of(context).size.height / 12,
-            margin: const EdgeInsets.only(left: 40, right: 40, bottom: 33),
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 0),
-            alignment: Alignment.bottomCenter,
-            decoration: const BoxDecoration(
-              color: Color(0xff333333),
-              borderRadius: BorderRadius.all(Radius.circular(6)),
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0x60000000),
-                  blurStyle: BlurStyle.outer,
-                  // blurRadius: 8,
-                  // spreadRadius: 20,
-                  // offset: Offset(0, 0),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _NavItem(
-                  iconPath: AppIcons.generateIcon,
-                  selectedIconPath: AppIcons.generateIcon,
-                  label: AppStrings.generate,
-                  isSelected: currentIndex == 0,
-                  onTap: () => onTap(0),
-                ),
-                _NavItem(
-                  iconPath: AppIcons.historyIcon,
-                  selectedIconPath: AppIcons.historyIcon,
-                  label: AppStrings.history,
-                  isSelected: currentIndex == 2,
-                  onTap: () => onTap(2),
-                ),
-              ],
-            ),
-          ),
           Positioned(
-            top: -30,
+            bottom: 0,
             left: 0,
             right: 0,
+            child: Container(
+              height: navBarHeight + bottomPadding,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.outline,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                border: Border(
+                  top: BorderSide(color: theme.colorScheme.primary, width: 2),
+                  // left: BorderSide(color: theme.colorScheme.primary, width: 1),
+                  // right: BorderSide(color: theme.colorScheme.primary, width: 1),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x60000000),
+                    blurStyle: BlurStyle.outer,
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  for (var i = 0; i < menuItems.length; i++) ...[
+                    Expanded(
+                      child: BottomNavItemCustomWidget(
+                        iconPath: menuItems[i].iconPath,
+                        label: menuItems[i].label,
+                        isSelected: currentIndex == menuItems[i].index,
+                        navBarHeight: navBarHeight,
+                        onTap: () {
+                          onTap(menuItems[i].index);
+                          menuItems[i].onTap?.call();
+                        },
+                      ),
+                    ),
+                    if (i == (menuItems.length / 2).floor() - 1)
+                      SizedBox(width: btnSize + 16),
+                  ],
+                ],
+              ),
+            ),
+          ),
+
+          Positioned(
+            bottom: navBarHeight + bottomPadding - halfBtn,
             child: DeferPointer(
               paintOnTop: true,
-              child: _CenterNavItem(
-                iconPath: AppIcons.scanIcon,
-                onTap: () => onTap(1),
+              child: CenterNavItemCustomWidget(
+                iconPath: centerItem.iconPath,
+                size: btnSize,
+                isSelected: currentIndex == centerItem.index,
+                isActive: centerItem.isActive,
+                onTap: () {
+                  onTap(centerItem.index);
+                  centerItem.onTap?.call();
+                },
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  const _NavItem({
-    required this.iconPath,
-    required this.selectedIconPath,
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  final String iconPath;
-  final String selectedIconPath;
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isSelected ? AppColors.secondary : Color(0xffD9D9D9);
-    return InkWell(
-      onTap: onTap,
-      splashColor: Colors.transparent,
-      highlightColor: Colors.transparent,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        // spacing: 8,
-        children: [
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 0),
-            transitionBuilder: (child, animation) {
-              return ScaleTransition(scale: animation, child: child);
-            },
-            child: SvgPicture.asset(
-              isSelected ? selectedIconPath : iconPath,
-              key: ValueKey('$isSelected-$label'),
-              width: 30,
-              height: 30,
-              colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-            ),
-          ),
-          const SizedBox(height: 4),
-          AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 200),
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-              fontFamily: AppStrings.fontPoppins,
-            ),
-            child: Text(label, textAlign: TextAlign.center),
-          ),
-          const SizedBox(height: 5),
-          isSelected
-              ? Container(
-                  width: 28,
-                  height: 3,
-                  padding: EdgeInsets.zero,
-                  margin: EdgeInsets.zero,
-                  decoration: const BoxDecoration(color: AppColors.secondary),
-                )
-              : const SizedBox(height: 3),
-        ],
-      ),
-    );
-  }
-}
-
-class _CenterNavItem extends StatelessWidget {
-  const _CenterNavItem({required this.iconPath, required this.onTap});
-
-  final String iconPath;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 70,
-        height: 70,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: AppColors.secondary,
-          shape: BoxShape.circle,
-          boxShadow: [BoxShadow(color: AppColors.secondary, blurRadius: 15)],
-        ),
-        child: SvgPicture.asset(iconPath, width: 40, height: 40),
       ),
     );
   }

@@ -1,19 +1,11 @@
 abstract class AppStrings {
-  static const String generate = 'Generate';
-  static const String history = 'history';
-  static const String watchList = 'Watch list';
-  static const String details = 'Details';
-  static const String releatedMovies = 'Similar';
-  static const String addedToWatchList = 'Added to watch list';
-  static const String removedFromWatchList = 'Removed from watch list';
-  static const String saveMovieAfterLoad =
-      'Please wait for the movie details to load.';
-  static const String watchListEmptyTitle = 'There is no movie yet!';
-  static const String watchListEmptySubtitle =
-      'Find your movie by type title,\ncategories, years, etc';
+  static const appVersion = '1.0.0';
+  static const appTitle = "Scanify";
+  static const packageName = "com.mrjoo.scanify";
 
   static const String fontPoppins = 'Poppins';
   static const String fontRoboto = 'Roboto';
   static const String fontMontserrat = 'Montserrat';
   static const String fontPopular = 'Popular';
+  static const String fontCairo = "cairo";
 }

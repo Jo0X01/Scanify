@@ -1,0 +1,3 @@
+tags:
+  integration:
+    description: "Tests that require real GPS or network (geocoding). Skip in CI."
