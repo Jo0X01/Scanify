@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart' show ThemeMode;
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart';
+import 'package:scanify/core/l10n/app_localizations.dart';
 
 enum AppThemeMode {
   system(0),

@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart';
+import 'package:scanify/core/l10n/app_localizations.dart';
 
 enum AvLanguages {
   system("System"),

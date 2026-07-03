@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode_scanner_app/features/generate/view/controller/tools/barcode_controller.dart';
-import 'package:qrcode_scanner_app/shared/widgets/text_form_field_with_label_custom_widget.dart';
+import 'package:scanify/features/generate/view/controller/tools/barcode_controller.dart';
+import 'package:scanify/shared/widgets/text_form_field_with_label_custom_widget.dart';
 
 class BarcodeTemplate extends StatefulWidget {
   const BarcodeTemplate({super.key, required this.templateController});

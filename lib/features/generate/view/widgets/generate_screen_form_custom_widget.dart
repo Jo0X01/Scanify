@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart';
-import 'package:qrcode_scanner_app/shared/widgets/custom_back_appbar.dart';
 
 class GenerateScreenFormCustomWidget extends StatefulWidget {
   const GenerateScreenFormCustomWidget({
@@ -26,62 +23,96 @@ class _GenerateScreenFormCustomWidgetState
     extends State<GenerateScreenFormCustomWidget> {
   @override
   Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context)!;
-    return PopScope(
-      canPop: true,
-      child: Scaffold(
-        // resizeToAvoidBottomInset: false,
-        persistentFooterAlignment: AlignmentDirectional.center,
-        appBar: CustomBackAppBar(title: l.generateQRCode, addSettings: false),
-        body: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Container(
-            alignment: Alignment.center,
-            margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
-            padding: const EdgeInsets.symmetric(vertical: 35, horizontal: 24),
-            decoration: BoxDecoration(
-              color: AppColors.tabBackground,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.symmetric(
-                horizontal: BorderSide(color: AppColors.primary, width: 2),
-                vertical: BorderSide(color: AppColors.primary, width: 0.1),
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              spacing: 20,
-              children: [
-                SvgPicture.asset(
-                  widget.icon,
-                  width: 40,
-                  height: 40,
-                  colorFilter: const ColorFilter.mode(
-                    Colors.white,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                Text(
-                  widget.title,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-                const Divider(color: AppColors.lIconColor),
-                widget.formChild,
-                const Divider(color: AppColors.lIconColor),
-                MaterialButton(
-                  onPressed: widget.onTap,
-                  color: AppColors.primary,
-                  textColor: AppColors.surface,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(l.generate),
-                ),
-              ],
+    return SingleChildScrollView(
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      child: Container(
+        alignment: Alignment.center,
+        // margin: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.outline,
+          borderRadius: BorderRadius.circular(8),
+          border: Border(
+            top: BorderSide(
+              color: Theme.of(context).colorScheme.secondary,
+              width: 4,
             ),
           ),
         ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  spacing: 10,
+                  children: [
+                    SvgPicture.asset(
+                      widget.icon,
+                      width: 25,
+                      height: 25,
+                      colorFilter: ColorFilter.mode(
+                        Theme.of(context).colorScheme.primary,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    Text(
+                      widget.title,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: widget.onTap,
+                      style: IconButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(context).colorScheme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                      icon: Icon(
+                        Icons.done_outline_rounded,
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: Navigator.of(context).pop,
+                      style: IconButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.outline,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                      ),
+                      icon: Icon(
+                        Icons.close_sharp,
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 5),
+            Divider(color: Theme.of(context).colorScheme.outlineVariant),
+            SizedBox(height: 25),
+            widget.formChild,
+            SizedBox(height: 15),
+          ],
+        ),
       ),
     );
+    //   ),
+    // );
   }
 }

@@ -1,24 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
-import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
-import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
+import 'package:fluttertoast/fluttertoast.dart' show Fluttertoast;
+import 'package:scanify/core/constants/app_assets.dart';
+import 'package:scanify/core/constants/app_strings.dart';
+import 'package:scanify/shared/widgets/custom_matrial_button.dart'
+    show CustomMaterialButton;
 
 abstract class AppDialogs {
-  static void showSnackBar(BuildContext context, String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        margin: EdgeInsets.only(bottom: 60, left: 25, right: 25),
-        duration: Duration(seconds: 2),
-        content: Text(
-          msg,
-          maxLines: 20,
-          softWrap: true,
-          overflow: TextOverflow.visible,
-        ),
-      ),
-    );
+  static void showNotifiyToast(BuildContext context, String msg) {
+    Fluttertoast.cancel();
+    Fluttertoast.showToast(msg: msg);
   }
 
   static void showPicker<T>({
@@ -31,7 +22,7 @@ abstract class AppDialogs {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppColors.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -43,7 +34,9 @@ abstract class AppDialogs {
             width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.iconColor.withValues(alpha: 0.4),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -51,14 +44,14 @@ abstract class AppDialogs {
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
             child: Text(
               title,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.outlineVariant,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
-          const Divider(height: 1, color: AppColors.divider),
+          Divider(height: 1),
           ...options.map((opt) {
             final isSelected = opt == current;
             return ListTile(
@@ -69,14 +62,16 @@ abstract class AppDialogs {
               title: Text(
                 opt.toString(),
                 style: TextStyle(
-                  color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                  color: isSelected
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
               trailing: isSelected
-                  ? const Icon(
+                  ? Icon(
                       Icons.check_rounded,
-                      color: AppColors.primary,
+                      color: Theme.of(context).colorScheme.primary,
                       size: 20,
                     )
                   : null,
@@ -100,27 +95,13 @@ abstract class AppDialogs {
       context: context,
       builder: (_) => AlertDialog(
         elevation: 1,
-        // insetPadding: EdgeInsets.all(0),
-        // actionsPadding: EdgeInsets.all(0),
-        // contentPadding: EdgeInsets.symmetric(horizontal: 20),
-        backgroundColor: AppColors.surface,
-        title: Text(
-          title,
-          style: const TextStyle(color: AppColors.textPrimary),
-        ),
-        content: content != null
-            ? Text(
-                content,
-                style: const TextStyle(color: AppColors.textSecondary),
-              )
-            : null,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text(title),
+        content: content != null ? Text(content) : null,
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
-              cancelText ?? "Cancel",
-              style: const TextStyle(color: AppColors.textSecondary),
-            ),
+            child: Text(cancelText ?? "Cancel"),
           ),
           TextButton(
             onPressed: () {
@@ -129,7 +110,7 @@ abstract class AppDialogs {
             },
             child: Text(
               confirmText ?? "Confirm",
-              style: const TextStyle(color: AppColors.error),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ),
         ],
@@ -150,6 +131,7 @@ abstract class AppDialogs {
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+
         title: Row(
           spacing: 10,
           children: [
@@ -197,30 +179,29 @@ abstract class AppDialogs {
               )
               .toList(),
         ),
+
         actions: [
           if (copyText != null)
-            MaterialButton(
-              onPressed: () => onCopy?.call(
-                rows.entries
-                    .map((ele) => "${ele.key}: ${ele.value}")
-                    .toString(),
-              ),
-              shape: RoundedRectangleBorder(
-                side: BorderSide(
-                  color: Theme.of(context).colorScheme.secondary,
+            SizedBox(
+              width: double.infinity,
+              child: MaterialButton(
+                elevation: 0,
+                onPressed: () => onCopy?.call(
+                  rows.entries.map((e) => "${e.key}: ${e.value}").join('\n'),
                 ),
-                borderRadius: BorderRadius.circular(12),
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(copyText),
               ),
-              child: Text(copyText),
             ),
           if (closeText != null)
-            MaterialButton(
+            CustomMaterialButton(
+              closeText: closeText,
               onPressed: Navigator.of(context).pop,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              color: Theme.of(context).colorScheme.primary,
-              child: Text(closeText),
             ),
         ],
       ),

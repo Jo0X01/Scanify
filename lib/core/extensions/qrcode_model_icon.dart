@@ -1,10 +1,10 @@
 import 'package:mobile_scanner/mobile_scanner.dart'
     show BarcodeType, BarcodeFormat;
-import 'package:qrcode_scanner_app/core/constants/app_assets.dart'
+import 'package:scanify/core/constants/app_assets.dart'
     show AppIcons;
-import 'package:qrcode_scanner_app/core/helpers/social_url_resolver.dart';
-import 'package:qrcode_scanner_app/core/models/qrcode_model.dart';
-import 'package:qrcode_scanner_app/core/enum/tool_data_types.dart'
+import 'package:scanify/core/helpers/social_url_resolver.dart';
+import 'package:scanify/core/models/qrcode_model.dart';
+import 'package:scanify/core/enum/tool_data_types.dart'
     hide BarcodeToolType;
 
 extension XQrModelIcon on QRCodeModel {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart';
-import 'package:qrcode_scanner_app/core/utils/validator.dart';
-import 'package:qrcode_scanner_app/features/generate/view/controller/tools/social_controller.dart'
+import 'package:scanify/core/extensions/context_addons_extension.dart';
+import 'package:scanify/core/utils/validator.dart';
+import 'package:scanify/features/generate/view/controller/tools/social_controller.dart'
     show SocialController;
-import 'package:qrcode_scanner_app/shared/widgets/text_form_field_with_label_custom_widget.dart'
+import 'package:scanify/shared/widgets/text_form_field_with_label_custom_widget.dart'
     show TextFormFieldWithLabelCustomWidget;
 
 class SocialTemplate extends StatefulWidget {
@@ -17,7 +17,6 @@ class SocialTemplate extends StatefulWidget {
 class _SocialTemplateState extends State<SocialTemplate> {
   @override
   Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context)!;
     return Column(
       spacing: 10,
       children: [
@@ -31,13 +30,13 @@ class _SocialTemplateState extends State<SocialTemplate> {
           TextFormFieldWithLabelCustomWidget(
             controller: widget.templateController.usernameController,
             validator: widget.templateController.usernameValidator,
-            hintText: l.enterUsernameId,
+            hintText: context.l.enterUsernameId,
           ),
         if (widget.templateController.hasPhone)
           TextFormFieldWithLabelCustomWidget(
             controller: widget.templateController.phoneController,
-            validator: (val) => Validator.validatePhoneNumber(val)?.message(l),
-            hintText: l.enterPhone,
+            validator: (val) => Validator.validatePhoneNumber(val)?.message(context.l),
+            hintText: context.l.enterPhone,
           ),
       ],
     );

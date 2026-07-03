@@ -986,4 +986,58 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get productBarcode => 'الرمز المنتج';
+
+  @override
+  String get enableHistory => 'تفعيل السجل';
+
+  @override
+  String get enableHistoryDesc =>
+      'حفظ رموز QR التي تم مسحها محليًا على جهازك للوصول إليها لاحقًا.';
+
+  @override
+  String get historyDisabled =>
+      'السجل معطل. قم بتفعيله من الإعدادات لعرض هذه الصفحة.';
+
+  @override
+  String get noWifiProtection => 'بدون حمايه';
+
+  @override
+  String get notifCameraTitle => 'الكاميرا قيد التشغيل';
+
+  @override
+  String get notifCameraBody => 'الكاميرا نشطة حالياً';
+
+  @override
+  String get notifSaveTitle => 'تم الحفظ بنجاح';
+
+  @override
+  String get notifSaveBody => 'تم حفظ رمز QR في السجل';
+
+  @override
+  String get notifClearTitle => 'تم مسح السجل';
+
+  @override
+  String get notifClearBody => 'تمت إزالة جميع رموز QR';
+
+  @override
+  String get notifDeleteTitle => 'تم الحذف';
+
+  @override
+  String get notifDeleteBody => 'تمت إزالة رمز QR من السجل';
+
+  @override
+  String get notifDeleteExpiredTitle => 'تم حذف العناصر المنتهية';
+
+  @override
+  String get notifDeleteExpiredBody =>
+      'تم حذف رموز QR المنتهية الصلاحية تلقائياً من السجل';
+
+  @override
+  String get initError => 'حدث خطأ أثناء التهيئة.';
+
+  @override
+  String get initSuccess => 'تمت التهيئة بنجاح.';
+
+  @override
+  String get initLoading => 'جارٍ التهيئة...';
 }

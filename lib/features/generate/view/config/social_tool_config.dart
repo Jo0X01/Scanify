@@ -1,15 +1,15 @@
-import 'package:qrcode_scanner_app/core/constants/app_assets.dart'
+import 'package:scanify/core/constants/app_assets.dart'
     show AppIcons;
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart'
+import 'package:scanify/core/l10n/app_localizations.dart'
     show AppLocalizations;
-import 'package:qrcode_scanner_app/core/utils/validator.dart' show Validator;
-import 'package:qrcode_scanner_app/core/enum/tool_data_types.dart'
+import 'package:scanify/core/utils/validator.dart' show Validator;
+import 'package:scanify/core/enum/tool_data_types.dart'
     show SocialType;
-import 'package:qrcode_scanner_app/features/generate/view/config/tool_config.dart'
+import 'package:scanify/features/generate/view/config/tool_config.dart'
     show ToolConfig;
-import 'package:qrcode_scanner_app/features/generate/view/controller/tools/social_controller.dart'
+import 'package:scanify/features/generate/view/controller/tools/social_controller.dart'
     show SocialController;
-import 'package:qrcode_scanner_app/features/generate/view/widgets/templates/social_template.dart'
+import 'package:scanify/features/generate/view/widgets/templates/social_template.dart'
     show SocialTemplate;
 
 ToolConfig _social({

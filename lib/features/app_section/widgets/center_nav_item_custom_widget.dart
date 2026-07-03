@@ -84,7 +84,7 @@ class _CenterNavItemCustomWidgetState extends State<CenterNavItemCustomWidget>
   @override
   Widget build(BuildContext context) {
     final iconSize = widget.size * 0.54;
-    final primaryColor = Theme.of(context).primaryColor;
+    final primaryColor = Theme.of(context).colorScheme.primary;
     return GestureDetector(
       onTap: widget.onTap,
       child: SizedBox(

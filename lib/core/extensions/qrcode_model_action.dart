@@ -2,8 +2,8 @@ import 'package:add_2_calendar/add_2_calendar.dart' show Event, Add2Calendar;
 import 'package:flutter_contacts/flutter_contacts.dart'
     show Contact, FlutterContacts, Name, Phone, Email, Organization;
 import 'package:mobile_scanner/mobile_scanner.dart' show BarcodeType;
-import 'package:qrcode_scanner_app/core/extensions/qrcode_model_type_parser.dart';
-import 'package:qrcode_scanner_app/core/models/qrcode_model.dart';
+import 'package:scanify/core/extensions/qrcode_model_type_parser.dart';
+import 'package:scanify/core/models/qrcode_model.dart';
 import 'package:url_launcher/url_launcher.dart' show LaunchMode, launchUrl;
 
 extension XQrModelAction on QRCodeModel {
@@ -36,8 +36,9 @@ extension XQrModelAction on QRCodeModel {
     BarcodeType.calendarEvent => _addToCalendar(),
     BarcodeType.isbn ||
     BarcodeType.product => _launch('https://www.barcodelookup.com/$data'),
-    BarcodeType.text ||
-    BarcodeType.unknown => _launch('https://www.google.com/search?q=$data'),
+    BarcodeType.text || BarcodeType.unknown => _launch(
+      'https://www.google.com/search?q=${Uri.encodeComponent(data ?? "")}',
+    ),
     null => null,
   };
 

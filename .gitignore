@@ -7,8 +7,6 @@
 .pub/
 build/
 pubspec.lock
-
-
 # Android
 android/.gradle/
 android/.kotlin/
@@ -77,3 +75,8 @@ coverage/
 *.freezed.dart
 *.mocks.dart
 lib/generated/
+.vscode/settings.json
+.vscode/settings.json
+
+screenshots/
+README.md

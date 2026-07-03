@@ -1,16 +1,16 @@
 import 'package:mobile_scanner/mobile_scanner.dart' show BarcodeFormat;
-import 'package:qrcode_scanner_app/core/constants/app_assets.dart'
+import 'package:scanify/core/constants/app_assets.dart'
     show AppIcons;
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart'
+import 'package:scanify/core/l10n/app_localizations.dart'
     show AppLocalizations;
-import 'package:qrcode_scanner_app/core/utils/validator.dart' show Validator;
-import 'package:qrcode_scanner_app/core/enum/tool_data_types.dart'
+import 'package:scanify/core/utils/validator.dart' show Validator;
+import 'package:scanify/core/enum/tool_data_types.dart'
     show BarcodeToolType;
-import 'package:qrcode_scanner_app/features/generate/view/config/tool_config.dart'
+import 'package:scanify/features/generate/view/config/tool_config.dart'
     show ToolConfig;
-import 'package:qrcode_scanner_app/features/generate/view/controller/tools/barcode_controller.dart'
+import 'package:scanify/features/generate/view/controller/tools/barcode_controller.dart'
     show BarcodeController;
-import 'package:qrcode_scanner_app/features/generate/view/widgets/templates/barcode_template.dart'
+import 'package:scanify/features/generate/view/widgets/templates/barcode_template.dart'
     show BarcodeTemplate;
 
 ToolConfig _barcode({

@@ -1,9 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:mobile_scanner/mobile_scanner.dart' show BarcodeType, BarcodeFormat;
-import 'package:qrcode_scanner_app/core/enum/tool_data_types.dart' show PopularType;
-import 'package:qrcode_scanner_app/features/generate/view/controller/interface/generate_template_controller.dart';
-import 'package:qrcode_scanner_app/shared/location_picker/location_picker.dart';
+import 'package:mobile_scanner/mobile_scanner.dart'
+    show BarcodeType, BarcodeFormat;
+import 'package:scanify/core/enum/tool_data_types.dart' show PopularType;
+import 'package:scanify/features/generate/view/controller/interface/generate_template_controller.dart';
+import 'package:scanify/shared/location_picker/location_picker.dart';
 
 enum LocationRequestState { permission, service, done, unknown }
 
@@ -36,7 +37,7 @@ class LocationController implements PopularTemplateController {
         result = result.copyWith(address: address);
       }
       return LocationRequestState.done;
-    } on LocationServiceDisabledException {
+    } on (LocationServiceDisabledException,GeocodingException) {
       return LocationRequestState.service;
     } on LocationPermissionDeniedException {
       return LocationRequestState.permission;
@@ -56,7 +57,7 @@ class LocationController implements PopularTemplateController {
     }
   }
 
-  void onChange() {
+  void onChange(String value) {
     final lt = double.tryParse(latController.text);
     final lg = double.tryParse(longController.text);
     if (lt == null || lg == null) return;

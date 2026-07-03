@@ -1,10 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:qrcode_scanner_app/core/constants/app_helpers.dart';
-import 'package:qrcode_scanner_app/core/services/settings_service.dart';
-import 'package:qrcode_scanner_app/core/enum/tool_data_types.dart'
-    show PopularType;
-import 'package:qrcode_scanner_app/features/generate/view/controller/interface/generate_template_controller.dart'
+import 'package:scanify/core/constants/app_helpers.dart';
+import 'package:scanify/core/services/settings_service.dart';
+import 'package:scanify/core/enum/tool_data_types.dart' show PopularType;
+import 'package:scanify/features/generate/view/controller/interface/generate_template_controller.dart'
     show PopularTemplateController;
 
 class EventController implements PopularTemplateController {
@@ -95,13 +94,13 @@ class EventController implements PopularTemplateController {
   }
 
   String _formatDate(DateTime dt) {
-    return '${dt.year}'
-        '${dt.month.toString().padLeft(2, '0')}'
-        '${dt.day.toString().padLeft(2, '0')}'
-        'T'
-        '${dt.hour.toString().padLeft(2, '0')}'
-        '${dt.minute.toString().padLeft(2, '0')}'
-        '${dt.second.toString().padLeft(2, '0')}';
+    final utc = dt.toUtc();
+    return '${utc.year.toString().padLeft(4, '0')}'
+        '${utc.month.toString().padLeft(2, '0')}'
+        '${utc.day.toString().padLeft(2, '0')}T'
+        '${utc.hour.toString().padLeft(2, '0')}'
+        '${utc.minute.toString().padLeft(2, '0')}'
+        '${utc.second.toString().padLeft(2, '0')}Z';
   }
 
   DateTime? getDateTimeValue(String? data) {

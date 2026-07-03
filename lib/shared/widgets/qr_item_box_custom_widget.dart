@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
-import 'package:qrcode_scanner_app/core/dialogs/app_dialogs.dart';
-import 'package:qrcode_scanner_app/core/enum/qr_source_type.dart';
-import 'package:qrcode_scanner_app/core/extensions/qrcode_model_icon.dart';
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart';
-import 'package:qrcode_scanner_app/core/models/qrcode_model.dart';
-import 'package:qrcode_scanner_app/core/constants/app_helpers.dart';
-import 'package:qrcode_scanner_app/shared/widgets/meta_text_custom_widget.dart';
+import 'package:scanify/core/constants/app_assets.dart';
+import 'package:scanify/core/dialogs/app_dialogs.dart';
+import 'package:scanify/core/enum/qr_source_type.dart';
+import 'package:scanify/core/extensions/qrcode_model_icon.dart';
+import 'package:scanify/core/l10n/app_localizations.dart';
+import 'package:scanify/core/models/qrcode_model.dart';
+import 'package:scanify/core/constants/app_helpers.dart';
+import 'package:scanify/shared/widgets/meta_text_custom_widget.dart';
 
 class QrItemBoxCustomWidget extends StatelessWidget {
   const QrItemBoxCustomWidget({
@@ -123,6 +123,8 @@ class QrItemBoxCustomWidget extends StatelessWidget {
                   context,
                   title: l.delete,
                   content: l.askOnDeleteMessage,
+                  confirmText: l.confirm,
+                  cancelText: l.cancel,
                   onConfirm: () => onDelete?.call(item),
                 ),
                 icon: SvgPicture.asset(

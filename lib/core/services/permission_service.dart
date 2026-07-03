@@ -1,4 +1,3 @@
-import 'dart:developer' show log;
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
@@ -10,11 +9,12 @@ class PermissionService {
   static final instance = PermissionService._();
 
   late final int sdkVersion;
-  final Set<Permission> _missedPermissionsList = {};
 
-  late final List<Permission> requiredPermission;
-  late final List<Permission> optionalPermission;
-  late final List<Permission> allPermission;
+  late final Set<Permission> requiredPermission;
+  late final Set<Permission> optionalPermission;
+  late final Set<Permission> allPermission;
+  late final Set<Permission> missedPermissions;
+
   late final ValueNotifier<bool> optionalPermsGrantedListener;
   late final ValueNotifier<bool> requiredPermsGrantedListener;
   late final ValueNotifier<bool> allPermsGrantedListener;
@@ -26,6 +26,8 @@ class PermissionService {
   Future<void> init({
     required List<Permission> requiredPermission,
     required List<Permission> optionalPermission,
+    bool? request,
+    bool? check,
   }) async {
     if (!kIsWeb && Platform.isAndroid) {
       final AndroidDeviceInfo android = await DeviceInfoPlugin().androidInfo;
@@ -36,94 +38,128 @@ class PermissionService {
     optionalPermsGrantedListener = ValueNotifier(false);
     requiredPermsGrantedListener = ValueNotifier(false);
     allPermsGrantedListener = ValueNotifier(false);
-    this.requiredPermission = requiredPermission;
-    this.optionalPermission = optionalPermission;
-    allPermission = requiredPermission + optionalPermission;
-    await requestRequiredPermissions();
+    missedPermissions = {};
+    this.requiredPermission = requiredPermission.toSet();
+    this.optionalPermission = optionalPermission.toSet();
+    allPermission = (requiredPermission + optionalPermission).toSet();
+    if (request ?? true) {
+      await requestRequiredPermissions();
+    }
+    if (check ?? true) {
+      await checkAllPermissions();
+    }
+  }
+
+  Future<bool> _permWorker({
+    required Set<Permission> perms,
+    bool saveIfMiss = false,
+    bool requestIfNotGranted = false,
+    bool checkIfAllGranted = false,
+  }) async {
+    if (kIsWeb) return false;
+    if (saveIfMiss) missedPermissions.removeWhere(perms.contains);
+    bool isAllGranted = true;
+    for (Permission perm in perms) {
+      perm = (perm == Permission.storage || perm == Permission.photos)
+          ? _storage
+          : perm;
+      if (!await perm.isGranted) {
+        if (requestIfNotGranted) {
+          try {
+            await perm.request();
+          }
+          // ignore: empty_catches
+          catch (e) {}
+        }
+        if (!await perm.isGranted) {
+          if (saveIfMiss) {
+            missedPermissions.add(perm);
+          }
+          isAllGranted = false;
+        }
+      }
+      if (checkIfAllGranted && isAllGranted) {
+        isAllGranted = true;
+      }
+    }
+    return isAllGranted;
   }
 
   Future<void> requestRequiredPermissions() async {
-    if (kIsWeb) return;
-    for (Permission perm in requiredPermission) {
-      if (await perm.isPermanentlyDenied) continue;
-      if (!await perm.isGranted) await perm.request();
-    }
+    await _permWorker(perms: requiredPermission, requestIfNotGranted: true);
+  }
+
+  Future<void> requestOptionalPermissions() async {
+    await _permWorker(perms: optionalPermission, requestIfNotGranted: true);
+  }
+
+  Future<void> requestAllPermissions() async {
+    await _permWorker(perms: allPermission, requestIfNotGranted: true);
+  }
+
+  Future<void> checkAllPermissions() async {
+    await _permWorker(
+      perms: allPermission,
+      saveIfMiss: true,
+      requestIfNotGranted: false,
+    );
   }
 
   Future<void> checkRequiredPermissions() async {
-    if (kIsWeb) return;
-    for (Permission perm in requiredPermission) {
-      if (await perm.isPermanentlyDenied) _missedPermissionsList.add(perm);
-      if (!await perm.isGranted) await perm.request();
-    }
-    await isAllPermsGranted;
+    await _permWorker(
+      perms: requiredPermission,
+      saveIfMiss: true,
+      requestIfNotGranted: false,
+    );
   }
 
-  Future<void> checkPermissions() async {
-    if (kIsWeb) return;
-    for (Permission perm in allPermission) {
-      if (await perm.isPermanentlyDenied) continue;
-      if (!await perm.isGranted) await perm.request();
-    }
-    await isAllPermsGranted;
+  Future<void> checkOptionalPermissions() async {
+    await _permWorker(
+      perms: optionalPermission,
+      saveIfMiss: true,
+      requestIfNotGranted: false,
+    );
   }
 
-  Future<void> checkMissedPermissions() async {
-    if (kIsWeb) return;
-    _missedPermissionsList.clear();
-    for (Permission perm in allPermission) {
-      if (!await perm.isGranted) {
-        _missedPermissionsList.add(perm);
-      }
-    }
-  }
+  Future<bool> get isAllGranted async => await _permWorker(
+    perms: allPermission,
+    saveIfMiss: true,
+    requestIfNotGranted: false,
+    checkIfAllGranted: true,
+  );
+  Future<bool> get isRequiredGranted async => await _permWorker(
+    perms: requiredPermission,
+    saveIfMiss: true,
+    requestIfNotGranted: false,
+    checkIfAllGranted: true,
+  );
+  Future<bool> get isOptionalGranted async => await _permWorker(
+    perms: optionalPermission,
+    saveIfMiss: true,
+    requestIfNotGranted: false,
+    checkIfAllGranted: true,
+  );
 
-  String get missedPermissionsStr {
-    if (_missedPermissionsList.isEmpty) return '';
-    return _missedPermissionsList
+  String missedPermissionsAsStr({String sep = ","}) {
+    if (missedPermissions.isEmpty) return '';
+    return missedPermissions
         .map((perm) => perm.toString().split('.').last.toUpperCase())
         .join(', ');
   }
 
-  List<String> get missedPermissionsStrList {
-    return _missedPermissionsList
-        .map((perm) => perm.toString().split('.').last.toUpperCase())
-        .toList();
-  }
-
-  Set<Permission> get missedPermissions => _missedPermissionsList;
-
-  Future<bool> get isAllPermsGranted async {
+  Future<void> updateListeners() async {
+    optionalPermsGrantedListener.value = await isOptionalGranted;
+    requiredPermsGrantedListener.value = await isRequiredGranted;
     allPermsGrantedListener.value =
-        await isOptionalGranted && await isRequiredGranted;
-    return allPermsGrantedListener.value;
+        optionalPermsGrantedListener.value &&
+        requiredPermsGrantedListener.value;
   }
 
-  Future<bool> get isOptionalGranted async {
-    optionalPermsGrantedListener.value = await _isPermsGranted(
-      optionalPermission,
-    );
-    return optionalPermsGrantedListener.value;
-  }
-
-  Future<bool> get isRequiredGranted async {
-    requiredPermsGrantedListener.value = await _isPermsGranted(
-      requiredPermission,
-    );
-    log(requiredPermsGrantedListener.value.toString());
-    return requiredPermsGrantedListener.value;
-  }
-
-  Future<bool> _isPermsGranted(List<Permission> perms) async {
-    for (final perm in perms) {
-      final resolved = (perm == Permission.storage || perm == Permission.photos)
-          ? _storage
-          : perm;
-      if (!await resolved.isGranted) {
-        await resolved.request();
-        return await resolved.isGranted;
-      }
-    }
-    return true;
-  }
+  // specific
+  Future<bool> get isCameraGranted => _permWorker(
+    perms: {Permission.camera},
+    saveIfMiss: false,
+    requestIfNotGranted: true,
+    checkIfAllGranted: true,
+  );
 }

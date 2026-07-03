@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:qrcode_scanner_app/core/enum/tool_data_types.dart';
-import 'package:qrcode_scanner_app/features/generate/view/controller/interface/generate_template_controller.dart';
+import 'package:scanify/core/enum/tool_data_types.dart';
+import 'package:scanify/features/generate/view/controller/interface/generate_template_controller.dart';
 
 class ContactController implements PopularTemplateController {
   @override
@@ -58,7 +58,7 @@ class ContactController implements PopularTemplateController {
   }
 
   @override
-  String buildQrData() { 
+  String buildQrData() {
     final buffer = StringBuffer()
       ..writeln("BEGIN:VCARD")
       ..writeln("VERSION:3.0")
@@ -67,15 +67,12 @@ class ContactController implements PopularTemplateController {
       final val = phone.replaceAll("+", "").trim();
       buffer.writeln("TEL:+$val");
     }
-    if (email.isNotEmpty) {
-      buffer.writeln("EMAIL:$email");
-    }
-    if (company.isNotEmpty) {
-      buffer.writeln("ORG:$company");
-    }
-    if (website.isNotEmpty) {
-      buffer.writeln("URL:$website");
-    }
+    if (email.isNotEmpty) buffer.writeln("EMAIL:$email");
+    if (company.isNotEmpty) buffer.writeln("ORG:$company");
+    if (website.isNotEmpty) buffer.writeln("URL:$website");
+    if (job.isNotEmpty) buffer.writeln("TITLE:$job");
+    if (address.isNotEmpty) buffer.writeln("ADR:;;$address;;;;");
+    if (note.isNotEmpty) buffer.writeln("NOTE:$note");
     buffer.writeln("END:VCARD");
     return buffer.toString();
   }
@@ -91,5 +88,4 @@ class ContactController implements PopularTemplateController {
     _address.dispose();
     _note.dispose();
   }
-  
 }

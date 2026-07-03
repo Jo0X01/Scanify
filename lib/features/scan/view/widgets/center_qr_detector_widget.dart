@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode_scanner_app/features/scan/view/widgets/custom_painter_box_widget.dart';
+import 'package:scanify/core/extensions/context_addons_extension.dart';
+import 'package:scanify/features/scan/view/widgets/custom_painter_box_widget.dart';
 
 class CenterQrDetectorAnimationWidget extends StatefulWidget {
   const CenterQrDetectorAnimationWidget({
@@ -97,7 +98,11 @@ class _CenterQrDetectorAnimationWidgetState
                 scanLinePosition: _scanLineAnimation.value,
                 allBarcodeCorners: widget.barcodeCorners,
                 cameraResolution: widget.cameraResolution,
-                scannerWidgetSize: MediaQuery.of(context).size,
+                scannerWidgetSize: context.mq.size,
+                color: context.colorTheme.primary,
+                detectedColor: widget.detected
+                    ? context.colorTheme.primary
+                    : context.colorTheme.onSurface,
               ),
             ),
           ),

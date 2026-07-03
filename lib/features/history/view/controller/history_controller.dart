@@ -1,17 +1,12 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:qrcode_scanner_app/core/enum/qr_source_type.dart';
-import 'package:qrcode_scanner_app/core/models/qrcode_model.dart';
-import 'package:qrcode_scanner_app/core/services/hive_service.dart';
-import 'package:qrcode_scanner_app/core/services/settings_service.dart';
-import 'package:qrcode_scanner_app/core/constants/app_helpers.dart';
+import 'package:scanify/core/enum/qr_source_type.dart';
+import 'package:scanify/core/managers/notification_manager.dart';
+import 'package:scanify/core/managers/scanner_manager.dart';
+import 'package:scanify/core/models/qrcode_model.dart';
 
 class HistoryController {
   late final ValueNotifier<List<QRCodeModel>> _items;
-  late final HiveService _hiveService;
-  late final SettingsService _settings;
   late final TextEditingController _searchTextController;
   late final Set<QrSourceType> _scanFilters;
   late final Set<BarcodeType> _typeFilters;
@@ -20,14 +15,12 @@ class HistoryController {
   HistoryController() {
     _searchTextController = TextEditingController();
     _items = ValueNotifier<List<QRCodeModel>>([]);
-    _hiveService = HiveService.instance;
-    _settings = SettingsService.instance;
     _scanFilters = {};
     _typeFilters = {};
     _formatFilters = {};
 
     loadData();
-    _hiveService.listenable.addListener(loadData);
+    ScannerManager.instance.setListenerToSavedQr(loadData);
   }
 
   Set<QrSourceType> get scanFilters => _scanFilters;
@@ -36,7 +29,6 @@ class HistoryController {
 
   bool get isFilterCleared =>
       (_scanFilters.isEmpty && _formatFilters.isEmpty && _typeFilters.isEmpty);
-
 
   Set<String> get filterTags => {
     ..._scanFilters.map((ele) => ele.name),
@@ -48,7 +40,7 @@ class HistoryController {
   TextEditingController get searchInputController => _searchTextController;
 
   void applyFilterAndLoad() {
-    _items.value = _hiveService.getAll<QRCodeModel>(
+    _items.value = ScannerManager.instance.getSavedQrModels(
       (ele) =>
           ((_searchTextController.text.isEmpty ||
               ele.data?.toLowerCase().contains(
@@ -68,8 +60,8 @@ class HistoryController {
     applyFilterAndLoad();
   }
 
-  void removeFilter(Enum itemType){
-    setFilter(null, itemType,false);
+  void removeFilter(Enum itemType) {
+    setFilter(null, itemType, false);
     applyFilterAndLoad();
   }
 
@@ -83,37 +75,30 @@ class HistoryController {
     }
   }
 
-  void setFilters(Map<String, Map<Enum, String>> groups, Set<Enum> items){
+  void setFilters(Map<String, Map<Enum, String>> groups, Set<Enum> items) {
     clearFilters();
-    for(final item in items){
+    for (final item in items) {
       setFilter(null, item, true);
     }
     applyFilterAndLoad();
   }
 
-
   Future<void> loadData() async {
-    final deleteAfterDays = _settings.autoDelete.value;
-    if (deleteAfterDays > 0) {
-      final allItems = _hiveService.getAll<QRCodeModel>();
-      for (final item in allItems) {
-        if (item.date != null &&
-            AppHelpers.isExpired(item.date!, deleteAfterDays)) {
-          await _hiveService.delete(item.id);
-        }
-      }
+    if (await ScannerManager.instance.deleteExpiredSavedModels()) {
+      NotificationManager.instance.notifiyDeleteExpired();
     }
     applyFilterAndLoad();
   }
 
   Future<void> deleteItem(QRCodeModel item) async {
-    if (await _hiveService.delete(item.id)) {
+    if (await ScannerManager.instance.deleteSavedQr(item)) {
       _items.value = List.from(_items.value)..remove(item);
+      NotificationManager.instance.notifiyDeleted();
     }
   }
 
   void dispose() {
-    _hiveService.listenable.removeListener(loadData);
+    ScannerManager.instance.removeListenerToSavedQr(loadData);
     _items.dispose();
     _searchTextController.dispose();
     _scanFilters.clear();

@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode_scanner_app/core/enum/app_theme_mode.dart'
-    show AppThemeMode;
-import 'package:qrcode_scanner_app/core/enum/auto_clear_detection_delay.dart';
-import 'package:qrcode_scanner_app/core/enum/auto_delete_history.dart';
-import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
-import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
-import 'package:qrcode_scanner_app/core/dialogs/app_dialogs.dart';
-import 'package:qrcode_scanner_app/core/enum/av_language.dart';
-import 'package:qrcode_scanner_app/core/enum/qr_error_correction.dart';
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart';
-import 'package:qrcode_scanner_app/features/settings/view/controller/settings_controller.dart';
-import 'package:qrcode_scanner_app/features/settings/view/widgets/setting_group_custom_widget.dart';
-import 'package:qrcode_scanner_app/features/settings/view/widgets/tiles/setting_action_info_custom_widget.dart';
-import 'package:qrcode_scanner_app/features/settings/view/widgets/tiles/setting_action_tile_custom_widget.dart';
-import 'package:qrcode_scanner_app/features/settings/view/widgets/tiles/setting_selector_tile_custom_widget.dart';
-import 'package:qrcode_scanner_app/features/settings/view/widgets/tiles/setting_toggle_tile_custom_widget.dart';
-import 'package:qrcode_scanner_app/features/settings/view/widgets/tiles/setting_info_tile_custom_widget.dart';
-import 'package:qrcode_scanner_app/shared/widgets/custom_back_appbar.dart';
+import 'package:scanify/core/enum/app_routes.dart' show AppRouteKeys;
+import 'package:scanify/core/enum/app_theme_mode.dart' show AppThemeMode;
+import 'package:scanify/core/enum/auto_clear_detection_delay.dart';
+import 'package:scanify/core/enum/auto_delete_history.dart';
+import 'package:scanify/core/constants/app_strings.dart';
+import 'package:scanify/core/dialogs/app_dialogs.dart';
+import 'package:scanify/core/enum/av_language.dart';
+import 'package:scanify/core/enum/qr_error_correction.dart';
+import 'package:scanify/core/l10n/app_localizations.dart';
+import 'package:scanify/features/settings/view/controller/settings_controller.dart';
+import 'package:scanify/features/settings/view/widgets/setting_group_custom_widget.dart';
+import 'package:scanify/features/settings/view/widgets/tiles/setting_action_info_custom_widget.dart';
+import 'package:scanify/features/settings/view/widgets/tiles/setting_action_tile_custom_widget.dart';
+import 'package:scanify/features/settings/view/widgets/tiles/setting_selector_tile_custom_widget.dart';
+import 'package:scanify/features/settings/view/widgets/tiles/setting_toggle_tile_custom_widget.dart';
+import 'package:scanify/features/settings/view/widgets/tiles/setting_info_tile_custom_widget.dart';
+import 'package:scanify/shared/widgets/custom_back_appbar.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
-  static const String routeName = AppRoutes.settingsScreen;
+  static const AppRouteKeys routeName = AppRouteKeys.settingsScreen;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -55,7 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   Widget _warningSection(BuildContext context, AppLocalizations l) {
     return SettingInfoTileCustomWidget(
-      hideListener: _screenController.missedPermsListener,
+      hiddenListener: _screenController.permWarnListener,
       title: l.requireMissedPermissions,
       isDestructive: true,
       icon: Icons.warning_amber_rounded,
@@ -151,8 +150,16 @@ class _SettingsScreenState extends State<SettingsScreen>
     return SettingGroupCustomWidget(
       title: l.history,
       children: [
+        SettingToggleTile(
+          listener: _screenController.settings.enableHistoryListener,
+          title: l.enableHistory,
+          subtitle: l.enableHistoryDesc,
+          icon: Icons.history,
+          onChanged: _screenController.settings.setEnableHistory,
+        ),
         SettingSelectorTile(
           listener: _screenController.settings.autoDeleteListener,
+          enableListener: _screenController.settings.enableHistoryListener,
           title: l.autoDelete,
           subtitle: l.autoDeleteSubtitle,
           icon: Icons.auto_delete_outlined,
@@ -163,6 +170,7 @@ class _SettingsScreenState extends State<SettingsScreen>
           title: l.clearHistory,
           icon: Icons.delete_sweep_outlined,
           isDestructive: true,
+          enableListener: _screenController.settings.enableHistoryListener,
           onTap: _screenController.clearHistory,
           onConfirmContent: l.clearHistoryMessage,
           onConfirmConfirmText: l.clear,
@@ -217,6 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen>
   void initState() {
     super.initState();
     _screenController = SettingsController();
+    _screenController.checkPermissions();
     WidgetsBinding.instance.addObserver(this);
   }
 

@@ -1,108 +1,105 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:qrcode_scanner_app/core/models/qrcode_model.dart';
-import 'package:qrcode_scanner_app/core/services/scanner_service.dart';
-import 'package:qrcode_scanner_app/core/services/settings_service.dart';
-import 'package:qrcode_scanner_app/core/utils/device_util.dart';
+import 'package:scanify/core/utils/logger.dart' show AppLogger;
+import 'package:scanify/core/managers/notification_manager.dart';
+import 'package:scanify/core/managers/scanner_manager.dart';
+import 'package:scanify/core/models/qrcode_model.dart';
+import 'package:scanify/core/services/permission_service.dart';
+
+enum ScanState { loading, permission, normal }
 
 class ScanController {
   ScanController() {
-    _controller = MobileScannerController(
-      detectionSpeed: DetectionSpeed.unrestricted,
-      detectionTimeoutMs: 750,
-    );
-    _scanner.setController(_controller);
+    _scannerManager = ScannerManager.instance;
+    _perms = PermissionService.instance;
+    screenState = ValueNotifier(ScanState.loading);
   }
 
-  late final ScannerService _scanner = ScannerService.instance;
-  late final SettingsService _settings = SettingsService.instance;
-  late final MobileScannerController _controller;
-  bool _isProcessing = false;
+  late final ValueNotifier<ScanState> screenState;
+  late final PermissionService _perms;
 
-  MobileScannerController? get controller => _scanner.getCurrentController();
-  ValueNotifier<bool> get detectListener => _scanner.detectedNotifier;
-  List<List<Offset>>? get detectedCorners => _scanner.detectedCorners;
-  bool get isDetect => _scanner.isDetected;
-  List<QRCodeModel>? get currentModels => _scanner.currentModels;
+  void init() async {
+    await checkPermissions();
+    ScannerManager.instance.addCameraListener(
+      NotificationManager.instance.notifyCameraState,
+    );
+  }
 
-  Future<List<QRCodeModel>?> onDetect(BarcodeCapture capture) async {
-    if (_isProcessing) return null;
-    try {
-      _isProcessing = true;
-      debugPrint('ScanController.onDetect: autoScan=${_settings.autoScan}');
-      _scanner.setScanQrOnly(_settings.scanQrCodeOnly);
-      _scanner.cancelClearTimer();
+  Future<void> checkPermissions() async {
+    await _perms.requestRequiredPermissions();
+    await _applyPermissionStatus();
+  }
 
-      if (_scanner.isAlreadyCaptured(capture)) {
-        if (_scanner.updateCorners(capture)) {
-          _scanner.refreshDetection();
-        }
-        _scanner.startClearTimer(_settings.autoClearDetection);
-        _isProcessing = false;
-        return null;
-      }
+  Future<void> refreshPermissionStatus() async {
+    await _applyPermissionStatus();
+  }
 
-      final model = _scanner.handleCapture(capture, limit: 3);
-      debugPrint('ScanController.onDetect: model returned=${model != null}');
-      if (model == null) {
-        _scanner.startClearTimer(_settings.autoClearDetection);
-        _isProcessing = false;
-        return null;
-      }
-
-      if (_settings.sound) await DeviceUtil.playClickSound();
-      if (_settings.haptics) await DeviceUtil.vibration();
-
-      if (!_settings.autoScan) {
-        debugPrint(
-          'ScanController.onDetect: autoScan disabled, returning null',
-        );
-        _scanner.startClearTimer(_settings.autoClearDetection);
-        _isProcessing = false;
-        return null;
-      }
-      _isProcessing = false;
-      return model;
-    } catch (e, stackTrace) {
-      debugPrint('ScanController.onDetect error: $e\n$stackTrace');
-      _isProcessing = false;
-      return null;
-    } finally {
-      // always re-arm the clear timer unless we returned a result for navigation
+  Future<void> _applyPermissionStatus() async {
+    if (!(await _perms.isRequiredGranted)) {
+      screenState.value = ScanState.permission;
+    } else {
+      screenState.value = ScanState.normal;
+      await _scannerManager.startDetection();
     }
   }
 
-  void clearDetection() => _scanner.clearDetection();
+  late final ScannerManager _scannerManager;
+
+  MobileScannerController get scanController => _scannerManager.controller;
+
+  String get missedPermissionStr => _perms.missedPermissionsAsStr();
+  ValueNotifier get detectListener => _scannerManager.detectListener;
+  ValueNotifier<bool> get torchState => _scannerManager.torchState;
+
+  bool get isTorchActive => _scannerManager.isTorchActive;
+  bool get autoScan => _scannerManager.autoScan;
+
+  Set<QRCodeModel> get models => _scannerManager.currentModels;
+
+  bool get isDetected => _scannerManager.isDetected;
+  List<List<Offset>>? get detectedCorners => _scannerManager.detectedCorners;
+  Size? get cameraResolution => _scannerManager.controller.value.size;
+
+  Future<Set<QRCodeModel>> onDetect(BarcodeCapture capture) async {
+    try {
+      final parseCapture = _scannerManager.analyzeFromCameraScan(capture);
+      if (parseCapture.isEmpty) {
+        return {};
+      }
+      if (!_scannerManager.autoScan) {
+        return {};
+      }
+      return parseCapture;
+    } catch (e, st) {
+      AppLogger.log('onDetect failed', e, st);
+      return {};
+    }
+  }
 
   Future<void> resumeCamera() async {
-    await _scanner.restartController();
-    _scanner.clearDetection();
+    await _scannerManager.turnTorchOff();
+    await _scannerManager.startDetection();
   }
 
   Future<void> pauseCamera() async {
-    await _scanner.stopController();
-    _scanner.clearDetection();
+    await _scannerManager.stopDetection();
+    await _scannerManager.turnTorchOff();
   }
 
-  Future<void> toggleTorch() async {
-    try {
-      await _scanner.toggleTorch();
-    } catch (e) {
-      debugPrint('ScanController.toggleTorch error: $e');
+  void toggleTorch() => _scannerManager.toggleTorch();
+
+  Future<Set<QRCodeModel>> pickFromGallery() async {
+    _scannerManager.clearDetection();
+    await _scannerManager.stopDetection();
+    await _scannerManager.turnTorchOff();
+    final result = await _scannerManager.pickAndAnalyzeFromGal();
+    if (result.isEmpty) {
+      await _scannerManager.startDetection();
+    } else {
+      await _scannerManager.stopDetection();
+      await _scannerManager.turnTorchOff();
     }
+    return result;
   }
 
-  Future<List<QRCodeModel>?> pickFromGallery() async {
-    try {
-      _scanner.setScanQrOnly(_settings.scanQrCodeOnly);
-      return await _scanner.pickFromGallery();
-    } catch (e, stackTrace) {
-      debugPrint('ScanController.pickFromGallery error: $e\n$stackTrace');
-      return null;
-    }
-  }
-
-  Future<void> dispose() async {
-    await _scanner.stopController();
-  }
 }

@@ -312,5 +312,22 @@
   "geoLongitude": "Longitude",
   "phoneNumber": "Phone Number",
   "phoneType": "Type",
-  "productBarcode": "Product Value"
+  "productBarcode": "Product Value",
+  "enableHistory": "Enable History",
+  "enableHistoryDesc": "Save scanned QR codes locally on your device for easy access later.",
+  "historyDisabled": "History is disabled. Enable it in Settings to view this page.",
+  "noWifiProtection": "Open Network",
+  "notifCameraTitle": "Camera is ON",
+  "notifCameraBody": "Your camera is currently active",
+  "notifSaveTitle": "Saved Successfully",
+  "notifSaveBody": "QR code has been saved to history",
+  "notifClearTitle": "History Cleared",
+  "notifClearBody": "All QR codes have been removed",
+  "notifDeleteTitle": "Item Deleted",
+  "notifDeleteBody": "QR code has been removed from history",
+  "notifDeleteExpiredTitle": "Expired Items Removed",
+  "notifDeleteExpiredBody": "Expired QR codes have been automatically deleted from history",
+  "initError": "An error occurred during initialization.",
+  "initSuccess": "Initialization completed successfully.",
+  "initLoading": "Initializing..."
 }

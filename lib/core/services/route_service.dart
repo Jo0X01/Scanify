@@ -1,19 +1,8 @@
 import 'package:flutter/material.dart';
 
-abstract class AppRoutes {
+abstract class RouteService {
   static final routeObserver = RouteObserver<ModalRoute<void>>();
-
-  static const String appRoute = '/';
-  static const String scanScreen = '/scan';
-  static const String detailsScreen = '/details';
-  static const String generateScreen = '/generate';
-  static const String historyScreen = '/history';
-  static const String settingsScreen = '/settings';
-  static const String templateScreen = '/generate-template';
-
-  static Future navigateToSettings(BuildContext context) {
-    return Navigator.of(context).pushNamed(AppRoutes.settingsScreen);
-  }
+  static final rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
   static Route<dynamic>? pureNavigateRoute(Widget screen) {
     return MaterialPageRoute(builder: (_) => screen);
@@ -47,6 +36,7 @@ abstract class AppRoutes {
   }
 
   static void goBack<T>(BuildContext context, [T? result]) {
+    ScaffoldMessenger.of(context).clearMaterialBanners();
     Navigator.of(context).pop(result);
   }
 

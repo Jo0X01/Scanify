@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
+import 'package:scanify/core/extensions/context_addons_extension.dart';
 
 class SettingGroupCustomWidget extends StatelessWidget {
   const SettingGroupCustomWidget({
@@ -20,8 +20,8 @@ class SettingGroupCustomWidget extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 6),
           child: Text(
             title.toUpperCase(),
-            style: const TextStyle(
-              color: AppColors.primary,
+            style: TextStyle(
+              color: context.colorTheme.primary,
               fontSize: 11,
               fontWeight: FontWeight.w700,
               letterSpacing: 1.1,
@@ -32,26 +32,22 @@ class SettingGroupCustomWidget extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 16),
           padding: const EdgeInsets.symmetric(horizontal: 5),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: context.colorTheme.surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.transparent)
+            border: Border.all(color: Colors.transparent),
           ),
-          child: Column(
-            children: _buildChilderns()
-          ),
+          child: Column(children: _buildChilderns(context.colorTheme.outline)),
         ),
       ],
     );
   }
 
-  List<Widget> _buildChilderns() {
+  List<Widget> _buildChilderns(Color color) {
     List<Widget> widgets = [];
     for (int i = 0; i < children.length; i++) {
       widgets.add(children[i]);
       if (i < children.length - 1) {
-        widgets.add(
-          const Divider(height: 1, thickness: 2, color: AppColors.divider),
-        );
+        widgets.add(Divider(height: 1, thickness: 2, color: color));
       }
     }
     return widgets;

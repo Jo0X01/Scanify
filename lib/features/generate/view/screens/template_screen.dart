@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
-import 'package:qrcode_scanner_app/core/enum/qr_source_type.dart';
-import 'package:qrcode_scanner_app/core/models/qrcode_model.dart';
-import 'package:qrcode_scanner_app/features/generate/view/controller/interface/generate_template_controller.dart';
-import 'package:qrcode_scanner_app/features/generate/view/widgets/generate_screen_form_custom_widget.dart';
+import 'package:scanify/core/enum/app_routes.dart';
+import 'package:scanify/core/extensions/context_addons_extension.dart';
+import 'package:scanify/core/enum/qr_source_type.dart';
+import 'package:scanify/core/models/qrcode_model.dart';
+import 'package:scanify/features/generate/view/controller/interface/generate_template_controller.dart';
+import 'package:scanify/features/generate/view/widgets/generate_screen_form_custom_widget.dart';
 
 class TemplateScreen extends StatefulWidget {
   const TemplateScreen({
@@ -15,7 +16,7 @@ class TemplateScreen extends StatefulWidget {
   final GenerateTemplateController templateController;
   final Widget child;
 
-  static const String routeName = AppRoutes.templateScreen;
+  static const routeName = AppRouteKeys.templateScreen;
 
   @override
   State<TemplateScreen> createState() => _TemplateScreenState();
@@ -34,22 +35,21 @@ class _TemplateScreenState extends State<TemplateScreen> {
       source: QrSourceType.generate,
     );
     if (!mounted) return;
-    await AppRoutes.navigateTo(
-      context,
-      AppRoutes.detailsScreen,
-      arguments: [model],
-    );
+    await context.goToDetails({model});
   }
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: GenerateScreenFormCustomWidget(
-        title: widget.templateController.title,
-        icon: widget.templateController.iconSvgPath,
-        onTap: _onSubmit,
-        formChild: widget.child,
+    return PopScope(
+      canPop: false,
+      child: Form(
+        key: _formKey,
+        child: GenerateScreenFormCustomWidget(
+          title: widget.templateController.title,
+          icon: widget.templateController.iconSvgPath,
+          onTap: _onSubmit,
+          formChild: widget.child,
+        ),
       ),
     );
   }

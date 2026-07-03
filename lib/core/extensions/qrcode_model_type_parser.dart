@@ -1,6 +1,6 @@
 
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:qrcode_scanner_app/core/models/qrcode_model.dart' show QRCodeModel;
+import 'package:scanify/core/models/qrcode_model.dart' show QRCodeModel;
 
 extension XQrModelParser on QRCodeModel {
   Object? fromType(BarcodeType type, String? data) {

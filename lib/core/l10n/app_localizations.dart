@@ -1969,6 +1969,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Product Value'**
   String get productBarcode;
+
+  /// No description provided for @enableHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable History'**
+  String get enableHistory;
+
+  /// No description provided for @enableHistoryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Save scanned QR codes locally on your device for easy access later.'**
+  String get enableHistoryDesc;
+
+  /// No description provided for @historyDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'History is disabled. Enable it in Settings to view this page.'**
+  String get historyDisabled;
+
+  /// No description provided for @noWifiProtection.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Network'**
+  String get noWifiProtection;
+
+  /// No description provided for @notifCameraTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera is ON'**
+  String get notifCameraTitle;
+
+  /// No description provided for @notifCameraBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your camera is currently active'**
+  String get notifCameraBody;
+
+  /// No description provided for @notifSaveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Successfully'**
+  String get notifSaveTitle;
+
+  /// No description provided for @notifSaveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'QR code has been saved to history'**
+  String get notifSaveBody;
+
+  /// No description provided for @notifClearTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'History Cleared'**
+  String get notifClearTitle;
+
+  /// No description provided for @notifClearBody.
+  ///
+  /// In en, this message translates to:
+  /// **'All QR codes have been removed'**
+  String get notifClearBody;
+
+  /// No description provided for @notifDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Item Deleted'**
+  String get notifDeleteTitle;
+
+  /// No description provided for @notifDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'QR code has been removed from history'**
+  String get notifDeleteBody;
+
+  /// No description provided for @notifDeleteExpiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired Items Removed'**
+  String get notifDeleteExpiredTitle;
+
+  /// No description provided for @notifDeleteExpiredBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired QR codes have been automatically deleted from history'**
+  String get notifDeleteExpiredBody;
+
+  /// No description provided for @initError.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred during initialization.'**
+  String get initError;
+
+  /// No description provided for @initSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Initialization completed successfully.'**
+  String get initSuccess;
+
+  /// No description provided for @initLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Initializing...'**
+  String get initLoading;
 }
 
 class _AppLocalizationsDelegate

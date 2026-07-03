@@ -994,4 +994,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get productBarcode => 'Product Value';
+
+  @override
+  String get enableHistory => 'Enable History';
+
+  @override
+  String get enableHistoryDesc =>
+      'Save scanned QR codes locally on your device for easy access later.';
+
+  @override
+  String get historyDisabled =>
+      'History is disabled. Enable it in Settings to view this page.';
+
+  @override
+  String get noWifiProtection => 'Open Network';
+
+  @override
+  String get notifCameraTitle => 'Camera is ON';
+
+  @override
+  String get notifCameraBody => 'Your camera is currently active';
+
+  @override
+  String get notifSaveTitle => 'Saved Successfully';
+
+  @override
+  String get notifSaveBody => 'QR code has been saved to history';
+
+  @override
+  String get notifClearTitle => 'History Cleared';
+
+  @override
+  String get notifClearBody => 'All QR codes have been removed';
+
+  @override
+  String get notifDeleteTitle => 'Item Deleted';
+
+  @override
+  String get notifDeleteBody => 'QR code has been removed from history';
+
+  @override
+  String get notifDeleteExpiredTitle => 'Expired Items Removed';
+
+  @override
+  String get notifDeleteExpiredBody =>
+      'Expired QR codes have been automatically deleted from history';
+
+  @override
+  String get initError => 'An error occurred during initialization.';
+
+  @override
+  String get initSuccess => 'Initialization completed successfully.';
+
+  @override
+  String get initLoading => 'Initializing...';
 }

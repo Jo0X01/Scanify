@@ -133,7 +133,7 @@ class _LocationPickerMapWidgetState extends State<LocationPickerMapWidget> {
         }
         return Column(
           children: [
-            if (widget.showSearchBar ?? true && !widget.readOnly)
+            if ((widget.showSearchBar ?? true) && !widget.readOnly)
               _buildSearchBar(),
             Expanded(child: _buildMap(widget.errorMsg)),
           ],

@@ -2,63 +2,57 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:qrcode_scanner_app/core/constants/app_helpers.dart';
-import 'package:qrcode_scanner_app/core/extensions/qrcode_model_action.dart';
-import 'package:qrcode_scanner_app/core/models/qrcode_model.dart';
-import 'package:qrcode_scanner_app/core/services/hive_service.dart';
-import 'package:qrcode_scanner_app/core/services/scanner_service.dart';
-import 'package:qrcode_scanner_app/core/services/settings_service.dart';
+import 'package:scanify/core/constants/app_helpers.dart';
+import 'package:scanify/core/utils/logger.dart' show AppLogger;
+import 'package:scanify/core/extensions/qrcode_model_action.dart';
+import 'package:scanify/core/managers/notification_manager.dart';
+import 'package:scanify/core/managers/scanner_manager.dart';
+import 'package:scanify/core/models/qrcode_model.dart';
+import 'package:scanify/core/services/settings_service.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 
 class DetailsController {
   late final SettingsService _setting;
-  late final ScannerService _scanner;
-  late final HiveService _hiveService;
-  late final List<QRCodeModel>? qrData;
-  late final ValueNotifier<List<QRCodeModel>?> qrDataListener;
+  late final ValueNotifier<Set<QRCodeModel>> qrDataListener;
   late final ScreenshotController _screenshotController;
 
   ScreenshotController get screenshotController => _screenshotController;
+  Set<QRCodeModel> get qrData => qrDataListener.value;
 
   String get locale => _setting.language.languageCode;
   bool get showAllDetails => _setting.showFullDetails;
-  bool get isQrDataEmpty => qrData?.isEmpty ?? true;
-  bool get isJustOneQr => qrData?.length == 1;
-  int get qrLength => qrData?.length ?? 0;
+  bool get isQrDataEmpty => qrData.isEmpty;
+  bool get isJustOneQr => qrData.length == 1;
+  int get qrLength => qrData.length;
+  QRCodeModel get qrModel => qrData.first;
+  bool get canOpen => qrModel.hasAction;
+  int get errorCorrectionLevel => _setting.errorCorrection.value;
 
-  QRCodeModel get qrModel => qrData!.first;
-
-  DetailsController([List<QRCodeModel>? qrModel]) {
+  DetailsController([Set<QRCodeModel>? qrModel]) {
     _setting = SettingsService.instance;
-    _hiveService = HiveService.instance;
-    _scanner = ScannerService.instance;
     _screenshotController = ScreenshotController();
-    qrData = qrModel ?? _scanner.currentModels;
-    qrDataListener = ValueNotifier(qrData);
-    debugPrint(
-      "DetailsController created with qrData: ${qrData?.map((e) => e.data).join(", ")}",
+    qrDataListener = ValueNotifier(
+      qrModel ?? ScannerManager.instance.currentModels,
     );
-    if (qrData != null && qrData!.isNotEmpty) {
-      for (final item in qrData!) {
-        if (item.id != null) {
-          _hiveService.put(item.id, item);
-        }
+    saveToDB();
+  }
+
+  Future<void> saveToDB() async {
+    if (_setting.enableHistory) {
+      if (await ScannerManager.instance.saveQrModels(qrData)) {
+        NotificationManager.instance.notifiySaved();
       }
     }
   }
 
   void removeQrByIndex(QRCodeModel item) {
-    debugPrint(qrData.toString());
-    if (qrData!.remove(item) && qrData!.isNotEmpty) {
-      qrDataListener.value = qrData?.toList();
+    if (qrData.remove(item)) {
+      qrDataListener.value = qrData.toSet();
     }
-    debugPrint(qrData.toString());
   }
 
-  QRCodeModel getQrByIndex(int index) {
-    return qrData!.elementAt(index);
-  }
+  QRCodeModel getQrByIndex(int index) => qrData.elementAt(index);
 
   String? getQrDate(QRCodeModel qr) {
     if (qr.date == null) return null;
@@ -68,8 +62,6 @@ class DetailsController {
       locale: _setting.language.languageCode,
     );
   }
-
-  bool get canOpen => qrModel.hasAction;
 
   Future<void> openAction() async {
     if (qrModel.hasAction) {
@@ -83,7 +75,8 @@ class DetailsController {
       if (text == null) return false;
       await Clipboard.setData(ClipboardData(text: text));
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      AppLogger.log('copyTextToClipboard failed', e, st);
       return false;
     }
   }
@@ -99,7 +92,8 @@ class DetailsController {
       }
       await Pasteboard.writeImage(bytes);
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      AppLogger.log('copyImageToClipboard failed', e, st);
       return false;
     }
   }
@@ -118,7 +112,8 @@ class DetailsController {
         ShareParams(text: qrModel.data, files: [XFile(image)]),
       );
       return result.status == ShareResultStatus.success;
-    } catch (e) {
+    } catch (e, st) {
+      AppLogger.log('shareTo failed', e, st);
       return false;
     }
   }
@@ -135,10 +130,9 @@ class DetailsController {
         return false;
       }
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      AppLogger.log('saveToGallery failed', e, st);
       return false;
     }
   }
-
-  int get errorCorrectionLevel => _setting.errorCorrection.value;
 }

@@ -1,5 +1,5 @@
-name: qrcode_scanner_app
-description: "A new Flutter project."
+name: scanify
+description: "Scan, generate and manage QR codes"
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -10,31 +10,22 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.8
   flutter_native_splash: ^2.4.7
   hive: ^2.2.3
-  toastification: ^3.0.3
-  skeletonizer: ^2.1.2
   flutter_svg: ^2.2.3
   defer_pointer: ^0.0.2
-  rename_app: ^1.6.5
-  flutter_launcher_icons: ^0.14.4
   permission_handler: ^12.0.1
   mobile_scanner: ^7.1.4
   image_picker: ^1.2.1
-  qr_flutter: ^4.1.0
-  qr: ^3.0.2
   screenshot: ^3.0.0
   share_plus: ^12.0.1
   path_provider: ^2.1.5
   hive_flutter: ^1.1.0
   crypto: ^3.0.7
-  configuration_service: ^1.0.4
   shared_preferences: ^2.5.5
   flutter_localization: ^0.4.0
   flutter_localizations:
     sdk: flutter
-  riverpod: ^3.2.1
   intl: ^0.20.2
   pasteboard: ^0.5.0
   external_path: ^2.2.0
@@ -51,13 +42,15 @@ dependencies:
   url_launcher: ^6.3.2
   flutter_contacts: ^2.1.0
   add_2_calendar: ^3.0.1
+  fluttertoast: ^9.0.0
+  awesome_notifications:  ^0.10.0
+  image: ^4.8.0
+  flutter_zxing: ^2.2.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  mockito: ^5.5.0
-  build_runner: ^2.7.1
 
 
 flutter:
@@ -75,3 +68,9 @@ flutter:
     - assets/icons/barcodes/
     - assets/fonts/
     - assets/images/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app-logo.png"
+  min_sdk_android: 21

@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart' show TextButton, showDialog, AlertDialog;
+import 'package:flutter/material.dart'
+    show AlertDialog, MaterialButton, Theme, showDialog;
 import 'package:flutter/widgets.dart';
-import 'package:qrcode_scanner_app/shared/widgets/meta_text_custom_widget.dart'
+import 'package:scanify/shared/widgets/meta_text_custom_widget.dart'
     show MetaTextCustomWidget, MetaTextMode;
 
 class SelectedFilterCustomWidget<T extends Enum> extends StatelessWidget {
@@ -54,6 +55,7 @@ class SelectedFilterCustomWidget<T extends Enum> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      spacing: 10,
       children: [
         SingleChildScrollView(
           child: Column(
@@ -63,12 +65,20 @@ class SelectedFilterCustomWidget<T extends Enum> extends StatelessWidget {
             ],
           ),
         ),
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-            onApply?.call(groupItems, _selectedItems);
-          },
-          child: Text(applyText),
+        SizedBox(
+          width: double.infinity,
+          child: MaterialButton(
+            color: Theme.of(context).colorScheme.primary,
+            textColor: Theme.of(context).colorScheme.surface,
+            onPressed: () {
+              Navigator.pop(context);
+              onApply?.call(groupItems, _selectedItems);
+            },
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(applyText),
+          ),
         ),
       ],
     );
