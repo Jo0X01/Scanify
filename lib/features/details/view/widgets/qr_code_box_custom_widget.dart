@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
-import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
-import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
-import 'package:qrcode_scanner_app/core/enum/qr_source_type.dart';
-import 'package:qrcode_scanner_app/core/extensions/qrcode_model_viewer.dart';
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart';
-import 'package:qrcode_scanner_app/core/models/qrcode_model.dart';
-import 'package:qrcode_scanner_app/core/constants/app_helpers.dart';
-import 'package:qrcode_scanner_app/shared/widgets/meta_text_custom_widget.dart';
+import 'package:scanify/core/constants/app_assets.dart';
+import 'package:scanify/core/enum/qr_source_type.dart';
+import 'package:scanify/core/extensions/context_addons_extension.dart';
+import 'package:scanify/core/extensions/qrcode_model_viewer.dart';
+import 'package:scanify/core/models/qrcode_model.dart';
+import 'package:scanify/core/constants/app_helpers.dart';
+import 'package:scanify/shared/widgets/meta_text_custom_widget.dart';
 import 'package:screenshot/screenshot.dart';
 
 class QrCodeBoxCustomWidget extends StatelessWidget {
@@ -38,8 +37,8 @@ class QrCodeBoxCustomWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenH = MediaQuery.of(context).size.height;
-    final l = AppLocalizations.of(context)!;
+    final screenH = context.mq.size.height;
+  
     return Container(
       alignment: Alignment.center,
       width: double.maxFinite,
@@ -48,20 +47,21 @@ class QrCodeBoxCustomWidget extends StatelessWidget {
         vertical: screenH * 0.03,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colorTheme.surfaceBright,
+        border: Border.all(color: context.colorTheme.outline),
         borderRadius: BorderRadius.circular(cardRadius),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildTags(l),
+          _buildTags(context),
           SizedBox(height: screenH * 0.018),
           Screenshot(
             controller: saveController,
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.lDivider,
-                border: Border.all(color: AppColors.divider),
+                color: Colors.white,
+                border: Border.all(color: context.colorTheme.outline),
                 borderRadius: BorderRadius.circular(cardRadius * 0.75),
               ),
               child: SizedBox(
@@ -85,32 +85,32 @@ class QrCodeBoxCustomWidget extends StatelessWidget {
           SizedBox(height: screenH * 0.014),
           Text(
             AppHelpers.getReadableDate(qrData.date, locale: locale),
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: context.theme.textTheme.bodyMedium,
           ),
           SizedBox(height: screenH * 0.02),
 
           Divider(
             height: 1,
             thickness: 1,
-            color: Theme.of(context).colorScheme.primary,
+            color: context.colorTheme.primary,
           ),
           SizedBox(height: screenH * 0.02),
-          _buildQrData(context, l),
+          _buildQrData(context),
         ],
       ),
     );
   }
 
-  Widget _buildTags(AppLocalizations l) {
+  Widget _buildTags(BuildContext context) {
     List<Widget> tags = [];
     if (qrData.type != null) {
-      tags.add(MetaTextCustomWidget(label: qrData.type!.label(l)));
+      tags.add(MetaTextCustomWidget(label: qrData.type!.label(context.l)));
     }
     if (qrData.source != null) {
-      tags.add(MetaTextCustomWidget(label: qrData.source!.label(l)));
+      tags.add(MetaTextCustomWidget(label: qrData.source!.label(context.l)));
     }
     if (qrData.format != null) {
-      tags.add(MetaTextCustomWidget(label: qrData.format!.label(l)));
+      tags.add(MetaTextCustomWidget(label: qrData.format!.label(context.l)));
     }
     if (tags.isEmpty) {
       return SizedBox.shrink();
@@ -118,8 +118,8 @@ class QrCodeBoxCustomWidget extends StatelessWidget {
     return Wrap(spacing: 8, runSpacing: 8, children: tags);
   }
 
-  Column _buildQrData(BuildContext context, AppLocalizations l) {
-    final viewData = qrData.viewData(l);
+  Column _buildQrData(BuildContext context) {
+    final viewData = qrData.viewData(context.l);
     if (viewData == null) {
       return Column(
         children: [
@@ -169,7 +169,7 @@ class QrCodeBoxCustomWidget extends StatelessWidget {
                     spacing: 5,
                     children: [
                       Text(
-                        ele.value ?? l.typeUnknown,
+                        ele.value ?? context.l.typeUnknown,
                         overflow: TextOverflow.ellipsis,
                         // textAlign: TextAlign.left,
                         maxLines: 1,

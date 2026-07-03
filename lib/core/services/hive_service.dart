@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -6,12 +5,14 @@ class HiveService {
   HiveService._();
   static final instance = HiveService._();
 
-  final String _boxName =
-      '102c2b93bfe65a2f45cda4af7288767428e120b9222d866539bddb5183b498a8';
+  late final String _boxName;
   bool _initialized = false;
 
-  Future<void> init({List<TypeAdapter>? adapters}) async {
+  Future<void> init({String? boxName, List<TypeAdapter>? adapters}) async {
     if (_initialized) return;
+    _boxName =
+        boxName ??
+        '102c2b93bfe65a2f45cda4af7288767428e120b9222d866539bddb5183b498a8';
 
     try {
       await Hive.initFlutter();
@@ -29,17 +30,12 @@ class HiveService {
       }
 
       _initialized = true;
-      debugPrint('LocalDB initialized successfully');
-    } catch (e, stackTrace) {
-      debugPrint('LocalDB initialization failed: $e');
-      debugPrintStack(stackTrace: stackTrace);
+    } catch (e) {
       try {
         await Hive.deleteBoxFromDisk(_boxName);
         await Hive.openBox<dynamic>(_boxName);
         _initialized = true;
-        debugPrint('LocalDB re-initialized after clearing corrupted data');
       } catch (e2) {
-        debugPrint('LocalDB re-initialization failed: $e2');
         rethrow;
       }
     }
@@ -65,11 +61,13 @@ class HiveService {
     await _box.put(key, value);
   }
 
-  Future<void> putIfAbsent<T>(String? key, T? value) async {
-    if (value == null || key == null) return;
+  Future<bool> putIfAbsent<T>(String? key, T? value) async {
+    if (value == null || key == null) return false;
     if (!_box.containsKey(key)) {
       await _box.put(key, value);
+      return true;
     }
+    return false;
   }
 
   T? get<T>(String key) {
@@ -78,7 +76,7 @@ class HiveService {
 
   List<T> getAll<T>([bool Function(T)? callback]) {
     final result = _box.values.whereType<T>();
-    if(callback != null){
+    if (callback != null) {
       return result.where(callback).toList();
     }
     return result.toList();

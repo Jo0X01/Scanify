@@ -1,17 +1,13 @@
 import 'package:hive/hive.dart';
+import 'package:scanify/core/constants/app_helpers.dart' show AppHelpers;
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:qrcode_scanner_app/core/constants/app_helpers.dart'
-    show AppHelpers;
-import 'package:qrcode_scanner_app/core/enum/qr_error_correction.dart'
-    show QrErrorCorrectionLevel;
-import 'package:qrcode_scanner_app/core/enum/qr_source_type.dart';
+import 'package:scanify/core/enum/qr_source_type.dart';
 
 class QRCodeModel extends HiveObject {
   final String? id;
   final String? data;
   final String? typeStr;
   final String? formatStr;
-  final QrErrorCorrectionLevel? eccLevel;
   final int? date;
   final QrSourceType? source;
   final BarcodeFormat? format;
@@ -28,7 +24,6 @@ class QRCodeModel extends HiveObject {
     this.source,
     this.format,
     this.type,
-    this.eccLevel,
   });
 
   factory QRCodeModel.fromData(
@@ -45,7 +40,7 @@ class QRCodeModel extends HiveObject {
       typeStr: type.name,
       format: format,
       formatStr: format.name,
-      source: source
+      source: source,
     );
   }
 
@@ -62,14 +57,14 @@ class QRCodeModel extends HiveObject {
       typeStr: code.type.name,
       format: code.format,
       formatStr: code.format.name,
-      source: source
+      source: source,
     );
   }
 
-  static List<QRCodeModel> fromBarcodes(
-    List<Barcode> codes,
+  static Set<QRCodeModel> fromBarcodes(
+    Set<Barcode> codes,
     QrSourceType source,
-  ) => codes.map((c) => QRCodeModel.fromBarcode(c, source)).toList();
+  ) => codes.map((c) => QRCodeModel.fromBarcode(c, source)).toSet();
 
   QRCodeModel copyWith({
     String? id,
@@ -81,7 +76,6 @@ class QRCodeModel extends HiveObject {
     QrSourceType? source,
     BarcodeFormat? format,
     BarcodeType? type,
-    QrErrorCorrectionLevel? eccLevel,
   }) => QRCodeModel(
     id: id ?? this.id,
     data: data ?? this.data,
@@ -92,7 +86,6 @@ class QRCodeModel extends HiveObject {
     source: source ?? this.source,
     format: format ?? this.format,
     type: type ?? this.type,
-    eccLevel: eccLevel ?? this.eccLevel,
   );
 
   @override

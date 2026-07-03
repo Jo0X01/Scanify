@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
-import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
-import 'package:qrcode_scanner_app/core/dialogs/app_dialogs.dart';
-import 'package:qrcode_scanner_app/core/enum/qr_source_type.dart';
-import 'package:qrcode_scanner_app/core/extensions/qrcode_model_icon.dart';
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart';
-import 'package:qrcode_scanner_app/core/models/qrcode_model.dart';
-import 'package:qrcode_scanner_app/features/details/view/controller/details_controller.dart';
-import 'package:qrcode_scanner_app/features/details/view/widgets/action_button_custom_widget.dart'
+import 'package:scanify/core/constants/app_assets.dart';
+import 'package:scanify/core/enum/app_routes.dart';
+import 'package:scanify/core/extensions/context_addons_extension.dart';
+import 'package:scanify/core/dialogs/app_dialogs.dart';
+import 'package:scanify/core/enum/qr_source_type.dart';
+import 'package:scanify/core/extensions/qrcode_model_icon.dart';
+import 'package:scanify/core/managers/scanner_manager.dart';
+import 'package:scanify/core/models/qrcode_model.dart';
+import 'package:scanify/features/details/view/controller/details_controller.dart';
+import 'package:scanify/features/details/view/widgets/action_button_custom_widget.dart'
     show ActionButtonCustomWidget;
-import 'package:qrcode_scanner_app/features/details/view/widgets/no_qr_data_widget.dart';
-import 'package:qrcode_scanner_app/features/details/view/widgets/qr_code_box_custom_widget.dart';
-import 'package:qrcode_scanner_app/shared/widgets/custom_back_appbar.dart';
-import 'package:qrcode_scanner_app/shared/widgets/qr_item_box_custom_widget.dart';
+import 'package:scanify/features/details/view/widgets/no_qr_data_widget.dart';
+import 'package:scanify/features/details/view/widgets/qr_code_box_custom_widget.dart';
+import 'package:scanify/shared/widgets/custom_back_appbar.dart';
+import 'package:scanify/shared/widgets/qr_item_box_custom_widget.dart';
 
 class DetailsScreen extends StatefulWidget {
-  DetailsScreen({super.key, List<QRCodeModel>? qrData})
+  DetailsScreen({super.key, Set<QRCodeModel>? qrData})
     : _screenController = DetailsController(qrData);
 
-  static const String routeName = AppRoutes.detailsScreen;
+  static const AppRouteKeys routeName = AppRouteKeys.detailsScreen;
   final DetailsController _screenController;
 
   @override
@@ -32,14 +33,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
       return NoQrDataWidget();
     }
 
-    final l = AppLocalizations.of(context)!;
-
     if (!widget._screenController.isJustOneQr) {
-      return _manyQrTemplate(context, l);
+      return _manyQrTemplate(context);
     }
 
-    final screenW = MediaQuery.of(context).size.width;
-    final screenH = MediaQuery.of(context).size.height;
+    final screenW = context.mq.size.width;
+    final screenH = context.mq.size.height;
     final isTablet = screenW >= 600;
     final hPadding = screenW * 0.06;
     final cardRadius = isTablet ? 20.0 : 16.0;
@@ -47,63 +46,63 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
     return Scaffold(
       appBar: CustomBackAppBar(
-        title: l.details,
+        title: context.l.details,
         onBackPressed: () {},
         menuItems: [
           if (widget._screenController.canOpen)
             CustomAppbarMenuAction(
               icon: AppIcons.openIcon,
-              title: l.open,
-              onTap: () => _onOpenAction(l),
+              title: context.l.open,
+              onTap: _onOpenAction,
             ),
           CustomAppbarMenuAction(
             icon: AppIcons.saveIcon,
-            title: l.save,
+            title: context.l.save,
             onTap: () async => _onActionTake(
               widget._screenController.saveToGallery,
-              l.savedSuccessfully,
-              l.saveError,
+              context.l.savedSuccessfully,
+              context.l.saveError,
             ),
           ),
           CustomAppbarMenuAction(
             icon: AppIcons.shareIcon,
-            title: l.share,
+            title: context.l.share,
             onTap: widget._screenController.shareTo,
           ),
           CustomAppbarMenuAction(
             icon: AppIcons.copyIcon,
-            title: l.copyQrImage,
+            title: context.l.copyQrImage,
             onTap: () async => _onActionTake(
               widget._screenController.copyImageToClipboard,
-              l.copiedToClipboard,
-              l.error,
+              context.l.copiedToClipboard,
+              context.l.error,
             ),
           ),
           CustomAppbarMenuAction(
             icon: AppIcons.copyIcon,
-            title: l.copyOriginalText,
+            title: context.l.copyOriginalText,
             onTap: () async => _onActionTake(
               widget._screenController.copyTextToClipboard,
-              l.copiedToClipboard,
-              l.error,
+              context.l.copiedToClipboard,
+              context.l.error,
             ),
           ),
           CustomAppbarMenuAction(
             icon: AppIcons.settingsIcon,
-            title: l.settings,
-            onTap: () async => AppRoutes.navigateToSettings(context),
+            title: context.l.settings,
+            onTap: context.goToSettings,
           ),
           CustomAppbarMenuAction(
             iconData: Icons.info,
-            title: l.summaryInfo,
+            title: context.l.summaryInfo,
             onTap: () async => AppDialogs.showSomeInfoInRowsDialog(
               context,
-              title: l.summaryInfo,
+              title: context.l.summaryInfo,
               icon: widget._screenController.qrModel.icon,
-              rows: _buildSummaryInfo(l),
-              closeText: l.okay,
-              copyText: l.copy,
-              onCopy: (val) => _onTextCopy(l, val),
+              rows: _buildSummaryInfo(),
+              closeText: context.l.okay,
+              copyText: context.l.copy,
+              onCopy: _onTextCopy,
             ),
           ),
         ],
@@ -142,7 +141,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         widget._screenController.screenshotController,
                     locale: widget._screenController.locale,
                     showFullText: widget._screenController.showAllDetails,
-                    onCopy: (val) => _onTextCopy(l, val),
+                    onCopy: _onTextCopy,
                   ),
                 ],
               ),
@@ -154,31 +153,31 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 if (widget._screenController.canOpen)
                   ActionButtonCustomWidget(
                     icon: AppIcons.openIcon,
-                    label: l.open,
-                    onTap: () => _onOpenAction(l),
+                    label: context.l.open,
+                    onTap: _onOpenAction,
                     quickBtn: false,
                   ),
                 ActionButtonCustomWidget(
                   icon: AppIcons.shareIcon,
-                  label: l.share,
+                  label: context.l.share,
                   onTap: widget._screenController.shareTo,
                 ),
                 ActionButtonCustomWidget(
                   icon: AppIcons.copyIcon,
-                  label: l.copy,
+                  label: context.l.copy,
                   onTap: () async => _onActionTake(
                     widget._screenController.copyImageToClipboard,
-                    l.copiedToClipboard,
-                    l.error,
+                    context.l.copiedToClipboard,
+                    context.l.error,
                   ),
                 ),
                 ActionButtonCustomWidget(
                   icon: AppIcons.saveIcon,
-                  label: l.save,
+                  label: context.l.save,
                   onTap: () async => _onActionTake(
                     widget._screenController.saveToGallery,
-                    l.savedSuccessfully,
-                    l.saveError,
+                    context.l.savedSuccessfully,
+                    context.l.saveError,
                   ),
                 ),
               ],
@@ -189,19 +188,20 @@ class _DetailsScreenState extends State<DetailsScreen> {
     );
   }
 
-  Widget _manyQrTemplate(BuildContext context, AppLocalizations l) {
-    final screenW = MediaQuery.of(context).size.width;
-    final screenH = MediaQuery.of(context).size.height;
+  Widget _manyQrTemplate(BuildContext context) {
+    final screenW = context.mq.size.width;
+    final screenH = context.mq.size.height;
     final hPadding = screenW * 0.06;
 
     return Scaffold(
-      appBar: CustomBackAppBar(title: l.details),
+      appBar: CustomBackAppBar(title: context.l.details),
       body: ValueListenableBuilder(
         valueListenable: widget._screenController.qrDataListener,
         builder: (_, value, _) {
           if (widget._screenController.isQrDataEmpty) {
             return NoQrDataWidget();
           }
+          final items = value.toList();
           return ListView.builder(
             padding: EdgeInsets.fromLTRB(
               hPadding,
@@ -214,13 +214,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
             itemBuilder: (_, i) => QrItemBoxCustomWidget(
               onDelete: (item) =>
                   widget._screenController.removeQrByIndex(item),
-              item: value![i],
+              item: items[i],
               onTap: () {
-                AppRoutes.navigateTo(
-                  context,
-                  DetailsScreen.routeName,
-                  arguments: [value[i]],
-                );
+                context.goTo(DetailsScreen.routeName, arguments: {items[i]});
               },
             ),
           );
@@ -229,33 +225,38 @@ class _DetailsScreenState extends State<DetailsScreen> {
     );
   }
 
-  Map<String, String> _buildSummaryInfo(AppLocalizations l) {
+  Map<String, String> _buildSummaryInfo() {
     final qr = widget._screenController.qrModel;
     return {
-      l.scanSource: qr.source?.label(l) ?? l.scanSourceUknown,
-      l.filterFormat: qr.format?.label(l) ?? l.formatUnknown,
-      l.filterType: qr.type?.label(l) ?? l.typeUnknown,
-      l.date: widget._screenController.getQrDate(qr) ?? l.dateUnknown,
-      l.dataLength: (qr.data?.length ?? 0).toString(),
+      context.l.scanSource:
+          qr.source?.label(context.l) ?? context.l.scanSourceUknown,
+      context.l.filterFormat:
+          qr.format?.label(context.l) ?? context.l.formatUnknown,
+      context.l.filterType: qr.type?.label(context.l) ?? context.l.typeUnknown,
+      context.l.date:
+          widget._screenController.getQrDate(qr) ?? context.l.dateUnknown,
+      context.l.dataLength: (qr.data?.length ?? 0).toString(),
     };
   }
 
-  void _onOpenAction(AppLocalizations l) async {
-    AppDialogs.showLoading(context, l.loading);
+  void _onOpenAction() async {
+    AppDialogs.showLoading(context, context.l.loading);
     await widget._screenController.openAction();
     if (!mounted) return;
     AppDialogs.hideLoading(context);
   }
 
-  void _onTextCopy(AppLocalizations l, String? val) async {
+  void _onTextCopy(String? val) async {
     if (val == null) {
-      AppDialogs.showSnackBar(context, l.noDataProvided);
+      AppDialogs.showNotifiyToast(context, context.l.noDataProvided);
       return;
     }
-    if (await widget._screenController.copyTextToClipboard(val) && mounted) {
-      AppDialogs.showSnackBar(context, l.copiedToClipboard);
-    } else {
-      AppDialogs.showSnackBar(context, l.error);
+    final isDone = await widget._screenController.copyTextToClipboard(val);
+    if (mounted) {
+      AppDialogs.showNotifiyToast(
+        context,
+        isDone ? context.l.copiedToClipboard : context.l.error,
+      );
     }
   }
 
@@ -267,10 +268,16 @@ class _DetailsScreenState extends State<DetailsScreen> {
     final isDone = await action();
     if (mounted) {
       if (isDone) {
-        AppDialogs.showSnackBar(context, success);
+        AppDialogs.showNotifiyToast(context, success);
       } else {
-        AppDialogs.showSnackBar(context, failed);
+        AppDialogs.showNotifiyToast(context, failed);
       }
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    ScannerManager.instance.clearDetection();
   }
 }

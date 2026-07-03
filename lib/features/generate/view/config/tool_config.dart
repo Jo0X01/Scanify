@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart' show Widget;
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart'
+import 'package:scanify/core/l10n/app_localizations.dart'
     show AppLocalizations;
-import 'package:qrcode_scanner_app/features/generate/view/controller/interface/generate_template_controller.dart'
+import 'package:scanify/features/generate/view/controller/interface/generate_template_controller.dart'
     show GenerateTemplateController;
 
 class ToolConfig {

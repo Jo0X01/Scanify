@@ -1,4 +1,4 @@
-package com.example.qrcode_scanner_app
+package com.mrjoo.scanify
 
 import io.flutter.embedding.android.FlutterActivity
 

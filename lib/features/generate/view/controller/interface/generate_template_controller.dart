@@ -1,6 +1,6 @@
 import 'package:mobile_scanner/mobile_scanner.dart'
     show BarcodeType, BarcodeFormat;
-import 'package:qrcode_scanner_app/core/enum/tool_data_types.dart';
+import 'package:scanify/core/enum/tool_data_types.dart';
 
 abstract interface class GenerateTemplateController {
   String get title;

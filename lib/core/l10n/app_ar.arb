@@ -311,5 +311,22 @@
     "geoLongitude": "خط الطول",
     "phoneNumber": "رقم الهاتف",
     "phoneType": "النوع",
-    "productBarcode": "الرمز المنتج"
+    "productBarcode": "الرمز المنتج",
+    "enableHistory": "تفعيل السجل",
+    "enableHistoryDesc": "حفظ رموز QR التي تم مسحها محليًا على جهازك للوصول إليها لاحقًا.",
+    "historyDisabled": "السجل معطل. قم بتفعيله من الإعدادات لعرض هذه الصفحة.",
+    "noWifiProtection": "بدون حمايه",
+    "notifCameraTitle": "الكاميرا قيد التشغيل",
+    "notifCameraBody": "الكاميرا نشطة حالياً",
+    "notifSaveTitle": "تم الحفظ بنجاح",
+    "notifSaveBody": "تم حفظ رمز QR في السجل",
+    "notifClearTitle": "تم مسح السجل",
+    "notifClearBody": "تمت إزالة جميع رموز QR",
+    "notifDeleteTitle": "تم الحذف",
+    "notifDeleteBody": "تمت إزالة رمز QR من السجل",
+    "notifDeleteExpiredTitle": "تم حذف العناصر المنتهية",
+    "notifDeleteExpiredBody": "تم حذف رموز QR المنتهية الصلاحية تلقائياً من السجل",
+    "initError": "حدث خطأ أثناء التهيئة.",
+    "initSuccess": "تمت التهيئة بنجاح.",
+    "initLoading": "جارٍ التهيئة..."
 }

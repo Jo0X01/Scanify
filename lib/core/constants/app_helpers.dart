@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:external_path/external_path.dart';
 import 'package:intl/intl.dart';
-import 'package:qrcode_scanner_app/core/constants/app_strings.dart';
+import 'package:scanify/core/constants/app_strings.dart';
 
 abstract class AppHelpers {
   static String fixQRString(String pattern, Map<String, String> args) {
@@ -44,16 +43,11 @@ abstract class AppHelpers {
     String locale = 'en',
   }) {
     try {
-      final date = DateFormat(pattern, locale).parse(dateString);
-      final val= DateTime(date.millisecondsSinceEpoch);
-      log(val.toString());
-      return val;
+      return DateFormat(pattern, locale).parse(dateString);
     } catch (e) {
-      log(e.toString());
       return null;
     }
   }
-
 
   static bool isExpired(int date, int days) {
     final savedAt = DateTime.fromMillisecondsSinceEpoch(date);

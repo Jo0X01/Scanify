@@ -1,8 +1,8 @@
 import 'package:mobile_scanner/mobile_scanner.dart' show BarcodeType;
-import 'package:qrcode_scanner_app/core/constants/app_helpers.dart';
-import 'package:qrcode_scanner_app/core/extensions/qrcode_model_type_parser.dart';
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart';
-import 'package:qrcode_scanner_app/core/models/qrcode_model.dart'
+import 'package:scanify/core/constants/app_helpers.dart';
+import 'package:scanify/core/extensions/qrcode_model_type_parser.dart';
+import 'package:scanify/core/l10n/app_localizations.dart';
+import 'package:scanify/core/models/qrcode_model.dart'
     show QRCodeModel;
 
 extension XQrCodeModelViewer on QRCodeModel {

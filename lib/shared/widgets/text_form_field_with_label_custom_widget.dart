@@ -1,22 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
 
-// ignore: must_be_immutable
 class TextFormFieldWithLabelCustomWidget extends StatefulWidget {
-  final TextInputType keyboardType;
-  final String? hintText;
-  bool obscureText;
-  final bool isPassword;
-  final TextEditingController controller;
-  final String? Function(String?)? validator;
-  final void Function()? onChanged;
-  final void Function()? onSubmit;
-  final String? labelText;
-  final bool? isTextBox;
-  final bool? enabled;
-  final bool? hidden;
-
-  TextFormFieldWithLabelCustomWidget({
+  const TextFormFieldWithLabelCustomWidget({
     required this.controller,
     this.validator,
     this.enabled,
@@ -27,10 +12,23 @@ class TextFormFieldWithLabelCustomWidget extends StatefulWidget {
     this.keyboardType = TextInputType.text,
     this.obscureText = false,
     this.isPassword = false,
-    super.key,
     this.onChanged,
     this.onSubmit,
+    super.key,
   });
+
+  final TextInputType keyboardType;
+  final String? hintText;
+  final bool obscureText;
+  final bool isPassword;
+  final TextEditingController controller;
+  final String? Function(String?)? validator;
+  final void Function(String value)? onChanged;
+  final void Function()? onSubmit;
+  final String? labelText;
+  final bool? isTextBox;
+  final bool? enabled;
+  final bool? hidden;
 
   @override
   State<TextFormFieldWithLabelCustomWidget> createState() =>
@@ -39,99 +37,89 @@ class TextFormFieldWithLabelCustomWidget extends StatefulWidget {
 
 class _TextFormFieldWithLabelCustomWidgetState
     extends State<TextFormFieldWithLabelCustomWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return (widget.hidden != null && widget.hidden == true)
-        ? const SizedBox.shrink()
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              widget.labelText == null
-                  ? const SizedBox()
-                  : Text(
-                      widget.labelText!,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        // color: AppColors.onPrimary
-                      ),
-                    ),
-              SizedBox(height: widget.labelText == null ? 0 : 5),
-              TextFormField(
-                onEditingComplete: widget.onSubmit,
-                onChanged: (_) => widget.onChanged?.call(),
-                enabled: widget.enabled,
-                maxLines: widget.isTextBox != null ? 5 : 1,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  // color: AppColors.onPrimary,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                obscureText: widget.obscureText,
-                decoration: InputDecoration(
-                  hintText: widget.hintText,
-                  hintStyle: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  suffixIcon: widget.isPassword
-                      ? IconButton(
-                          icon: Icon(
-                            widget.obscureText
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: const Color(0xff454A4F),
-                            size: 24,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              widget.obscureText = !widget.obscureText;
-                            });
-                          },
-                        )
-                      : null,
+  late final FocusNode _focusNode;
+  late bool _obscureText;
 
-                  contentPadding: const EdgeInsets.all(15),
-                  enabledBorder: outlineInputBorder(
-                    color: Color(0xffBABABA),
-                    radius: 10,
-                    width: 1,
-                  ),
-                  focusedBorder: outlineInputBorder(
-                    color: AppColors.iconColor,
-                    radius: 10,
-                    width: 1,
-                  ),
-                  errorBorder: outlineInputBorder(
-                    color: Colors.red,
-                    radius: 10,
-                    width: 1,
-                  ),
-                  focusedErrorBorder: outlineInputBorder(
-                    color: Colors.red,
-                    radius: 10,
-                    width: 1,
-                  ),
-                ),
-                keyboardType: widget.keyboardType,
-                controller: widget.controller,
-                validator: widget.validator,
-              ),
-            ],
-          );
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+    _obscureText = widget.obscureText;
   }
 
-  OutlineInputBorder outlineInputBorder({
-    required double radius,
-    required Color color,
-    required double width,
-  }) {
+  @override
+  void dispose() {
+    _focusNode.unfocus();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.hidden == true) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (widget.labelText != null) ...[
+          Text(
+            widget.labelText!,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+          ),
+          const SizedBox(height: 5),
+        ],
+        TextFormField(
+          focusNode: _focusNode,
+          autofocus: false,
+          controller: widget.controller,
+          validator: widget.validator,
+          enabled: widget.enabled,
+          keyboardType: widget.keyboardType,
+          obscureText: _obscureText,
+          maxLines: _obscureText ? 1 : (widget.isTextBox == true ? 5 : 1),
+          onEditingComplete: widget.onSubmit,
+          onChanged: widget.onChanged,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+            overflow: TextOverflow.ellipsis,
+          ),
+          decoration: InputDecoration(
+            hintText: widget.hintText,
+            hintStyle: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              color: Colors.grey,
+              overflow: TextOverflow.ellipsis,
+            ),
+            suffixIcon: widget.isPassword
+                ? IconButton(
+                    icon: Icon(
+                      _obscureText ? Icons.visibility_off : Icons.visibility,
+                      color: const Color(0xff454A4F),
+                      size: 24,
+                    ),
+                    onPressed: () => setState(() {
+                      _obscureText = !_obscureText;
+                    }),
+                  )
+                : null,
+            contentPadding: const EdgeInsets.all(15),
+            enabledBorder: _border(color: const Color(0xffBABABA)),
+            focusedBorder: _border(color: const Color(0xffBABABA)),
+            errorBorder: _border(color: Colors.red),
+            focusedErrorBorder: _border(color: Colors.red),
+            disabledBorder: _border(color: const Color(0xffBABABA)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  OutlineInputBorder _border({required Color color}) {
     return OutlineInputBorder(
-      borderRadius: BorderRadius.circular(radius),
-      borderSide: BorderSide(color: color, width: width),
+      borderRadius: BorderRadius.circular(10),
+      borderSide: BorderSide(color: color, width: 1),
     );
   }
 }

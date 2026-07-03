@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
 
 class CustomPainterBoxWidget extends CustomPainter {
   final bool detected;
@@ -10,6 +9,8 @@ class CustomPainterBoxWidget extends CustomPainter {
   final double cornerLengthFraction;
   final double strokeWidth;
   final double radius;
+  final Color? detectedColor;
+  final Color? color;
 
   const CustomPainterBoxWidget({
     required this.detected,
@@ -20,6 +21,8 @@ class CustomPainterBoxWidget extends CustomPainter {
     this.cornerLengthFraction = 0.12,
     this.strokeWidth = 3.5,
     this.radius = 20,
+    this.detectedColor,
+    this.color,
   });
 
   // ── coordinate mapping ───────────────────────────────────────────────────
@@ -223,9 +226,9 @@ class CustomPainterBoxWidget extends CustomPainter {
         ..shader = LinearGradient(
           colors: [
             Colors.transparent,
-            AppColors.primary.withValues(alpha: 0.8),
-            AppColors.primary,
-            AppColors.primary.withValues(alpha: 0.8),
+            (color ?? Colors.red).withValues(alpha: 0.8),
+            (color ?? Colors.red),
+            (color ?? Colors.red).withValues(alpha: 0.8),
             Colors.transparent,
           ],
         ).createShader(Rect.fromLTWH(0, scanY, size.width, 2)),
@@ -238,9 +241,9 @@ class CustomPainterBoxWidget extends CustomPainter {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            AppColors.primary.withValues(alpha: 0.0),
-            AppColors.primary.withValues(alpha: 0.08),
-            AppColors.primary.withValues(alpha: 0.0),
+            (color ?? Colors.red).withValues(alpha: 0.0),
+            (color ?? Colors.red).withValues(alpha: 0.08),
+            (color ?? Colors.red).withValues(alpha: 0.0),
           ],
         ).createShader(Rect.fromLTWH(0, scanY - 20, size.width, 40)),
     );
@@ -251,7 +254,7 @@ class CustomPainterBoxWidget extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = detected ? AppColors.primary : AppColors.scanBoxIdle
+      ..color = detectedColor ?? Colors.red
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;

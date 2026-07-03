@@ -43,7 +43,7 @@ class BottomNavItemCustomWidget extends StatelessWidget {
                 width: iconSize,
                 height: iconSize,
                 colorFilter: ColorFilter.mode(
-                  isSelected ? theme.primaryColor : theme.colorScheme.secondary,
+                  !isSelected ? theme.colorScheme.outlineVariant : theme.colorScheme.primary,
                   BlendMode.srcIn,
                 ),
               ),
@@ -52,7 +52,7 @@ class BottomNavItemCustomWidget extends StatelessWidget {
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
               style: TextStyle(
-                color: isSelected ? theme.primaryColor : theme.colorScheme.secondary,
+                color: !isSelected ? theme.colorScheme.outlineVariant : theme.colorScheme.primary,
                 fontSize: fontSize,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
@@ -64,7 +64,7 @@ class BottomNavItemCustomWidget extends StatelessWidget {
               width: isSelected ? iconSize - 2 : 0,
               height: 3,
               decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
+                color: !isSelected ? theme.colorScheme.outlineVariant : theme.colorScheme.primary,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),

@@ -1,14 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart' show ChangeNotifier, ValueNotifier;
-import 'package:qrcode_scanner_app/core/enum/app_theme_mode.dart'
-    show AppThemeMode;
-import 'package:qrcode_scanner_app/core/enum/auto_clear_detection_delay.dart';
-import 'package:qrcode_scanner_app/core/enum/auto_delete_history.dart';
-import 'package:qrcode_scanner_app/core/enum/av_language.dart';
-import 'package:qrcode_scanner_app/core/enum/qr_error_correction.dart';
-import 'package:qrcode_scanner_app/core/helpers/pref_helper.dart'
-    show PrefHelper;
+import 'package:scanify/core/enum/app_theme_mode.dart' show AppThemeMode;
+import 'package:scanify/core/enum/auto_clear_detection_delay.dart';
+import 'package:scanify/core/enum/auto_delete_history.dart';
+import 'package:scanify/core/enum/av_language.dart';
+import 'package:scanify/core/enum/qr_error_correction.dart';
+import 'package:scanify/core/utils/pref_helper.dart' show PrefHelper;
 
 final class _Keys {
   static const theme = 'theme';
@@ -20,16 +18,20 @@ final class _Keys {
   static const sound = 'sound';
   static const haptics = 'haptics';
   static const autoDelete = 'autoDelete';
-  static const qrGeneratedLvL = 'auto';
+  static const enableHistory = 'enableHistory';
+  static const qrErrorCorrectionLvL = 'qrErrorCorrectionLvL';
   static const fullResultText = "fullResultText";
 }
 
 class SettingsService extends ChangeNotifier {
-  SettingsService._();
+  SettingsService._() {
+    _sharedPref = PrefHelper();
+  }
   static final SettingsService instance = SettingsService._();
+  late final PrefHelper _sharedPref;
 
   Future<void> load() async {
-    await PrefHelper.load();
+    await _sharedPref.load();
 
     _theme = ValueNotifier(AppThemeMode.system);
     _language = ValueNotifier(AvLanguages.system);
@@ -42,17 +44,19 @@ class SettingsService extends ChangeNotifier {
     _haptics = ValueNotifier(true);
     _showFullDetails = ValueNotifier(true);
     _qrCodeOnly = ValueNotifier(true);
+    _enableHistory = ValueNotifier(true);
 
-    await setTheme(null,persist: false);
-    await setLanguage(null,persist: false);
-    await setAutoDeleteDay(null,persist: false);
-    await setErrorCorrectionLvL(null,persist: false);
-    await setAutoClearDetection(null,persist: false);
-    await setAutoScan(null,persist: false);
-    await setSound(null,persist: false);
-    await setHaptics(null,persist: false);
-    await setShowFullDetails(null,persist: false);
-    await setScanQrCodeOnly(null,persist: false);
+    await setTheme(null, persist: false);
+    await setLanguage(null, persist: false);
+    await setAutoDeleteDay(null, persist: false);
+    await setErrorCorrectionLvL(null, persist: false);
+    await setAutoClearDetection(null, persist: false);
+    await setAutoScan(null, persist: false);
+    await setSound(null, persist: false);
+    await setHaptics(null, persist: false);
+    await setShowFullDetails(null, persist: false);
+    await setScanQrCodeOnly(null, persist: false);
+    await setEnableHistory(null, persist: false);
   }
 
   late ValueNotifier<AppThemeMode> _theme;
@@ -63,6 +67,7 @@ class SettingsService extends ChangeNotifier {
 
   late ValueNotifier<bool> _autoScan;
   late ValueNotifier<bool> _sound;
+  late ValueNotifier<bool> _enableHistory;
   late ValueNotifier<bool> _haptics;
   late ValueNotifier<bool> _showFullDetails;
   late ValueNotifier<bool> _qrCodeOnly;
@@ -70,7 +75,7 @@ class SettingsService extends ChangeNotifier {
   AppThemeMode get theme => _theme.value;
   ValueNotifier<AppThemeMode> get themeListener => _theme;
   Future<void> setTheme(AppThemeMode? value, {bool persist = true}) async {
-    _theme.value = await PrefHelper.enumSetter(
+    _theme.value = await _sharedPref.enumSetter(
       _Keys.theme,
       value ?? _theme.value,
       AppThemeMode.values,
@@ -82,7 +87,7 @@ class SettingsService extends ChangeNotifier {
   ValueNotifier<AvLanguages> get languageListener => _language;
   List<AvLanguages> get supportedLocales => AvLanguages.values;
   Future<void> setLanguage(AvLanguages? value, {bool persist = true}) async {
-    _language.value = await PrefHelper.enumSetter(
+    _language.value = await _sharedPref.enumSetter(
       _Keys.language,
       value ?? _language.value,
       AvLanguages.values,
@@ -92,11 +97,24 @@ class SettingsService extends ChangeNotifier {
 
   AutoDeleteDay get autoDelete => _autoDelete.value;
   ValueNotifier<AutoDeleteDay> get autoDeleteListener => _autoDelete;
-  Future<void> setAutoDeleteDay(AutoDeleteDay? value,{ bool persist = true}) async {
-    _autoDelete.value = await PrefHelper.enumSetter(
+  Future<void> setAutoDeleteDay(
+    AutoDeleteDay? value, {
+    bool persist = true,
+  }) async {
+    _autoDelete.value = await _sharedPref.enumSetter(
       _Keys.autoDelete,
       value ?? _autoDelete.value,
       AutoDeleteDay.values,
+      persist,
+    );
+  }
+
+  bool get enableHistory => _enableHistory.value;
+  ValueNotifier<bool> get enableHistoryListener => _enableHistory;
+  Future<void> setEnableHistory(bool? value, {bool persist = true}) async {
+    _enableHistory.value = await _sharedPref.boolSetter(
+      _Keys.enableHistory,
+      value ?? _enableHistory.value,
       persist,
     );
   }
@@ -105,11 +123,11 @@ class SettingsService extends ChangeNotifier {
   ValueNotifier<QrErrorCorrectionLevel> get errorCorrectionListener =>
       _qrErrorCorrectionLvL;
   Future<void> setErrorCorrectionLvL(
-    QrErrorCorrectionLevel? value,{
+    QrErrorCorrectionLevel? value, {
     bool persist = true,
   }) async {
-    _qrErrorCorrectionLvL.value = await PrefHelper.enumSetter(
-      _Keys.qrGeneratedLvL,
+    _qrErrorCorrectionLvL.value = await _sharedPref.enumSetter(
+      _Keys.qrErrorCorrectionLvL,
       value ?? _qrErrorCorrectionLvL.value,
       QrErrorCorrectionLevel.values,
       persist,
@@ -120,10 +138,10 @@ class SettingsService extends ChangeNotifier {
   ValueNotifier<AutoClearDetectionDelay> get autoClearDetectionListener =>
       _autoClearDetection;
   Future<void> setAutoClearDetection(
-    AutoClearDetectionDelay? value,{
+    AutoClearDetectionDelay? value, {
     bool persist = true,
   }) async {
-    _autoClearDetection.value = await PrefHelper.enumSetter(
+    _autoClearDetection.value = await _sharedPref.enumSetter(
       _Keys.autoClearDelay,
       value ?? _autoClearDetection.value,
       AutoClearDetectionDelay.values,
@@ -133,8 +151,8 @@ class SettingsService extends ChangeNotifier {
 
   bool get autoScan => _autoScan.value;
   ValueNotifier<bool> get autoScanListener => _autoScan;
-  Future<void> setAutoScan(bool? value,{ bool persist = true}) async {
-    _autoScan.value = await PrefHelper.boolSetter(
+  Future<void> setAutoScan(bool? value, {bool persist = true}) async {
+    _autoScan.value = await _sharedPref.boolSetter(
       _Keys.autoScan,
       value ?? _autoScan.value,
       persist,
@@ -143,8 +161,8 @@ class SettingsService extends ChangeNotifier {
 
   bool get sound => _sound.value;
   ValueNotifier<bool> get soundListener => _sound;
-  Future<void> setSound(bool? value,{ bool persist = true}) async {
-    _sound.value = await PrefHelper.boolSetter(
+  Future<void> setSound(bool? value, {bool persist = true}) async {
+    _sound.value = await _sharedPref.boolSetter(
       _Keys.sound,
       value ?? _sound.value,
       persist,
@@ -153,8 +171,8 @@ class SettingsService extends ChangeNotifier {
 
   bool get haptics => _haptics.value;
   ValueNotifier<bool> get hapticsListener => _haptics;
-  Future<void> setHaptics(bool? value,{ bool persist = true}) async {
-    _haptics.value = await PrefHelper.boolSetter(
+  Future<void> setHaptics(bool? value, {bool persist = true}) async {
+    _haptics.value = await _sharedPref.boolSetter(
       _Keys.haptics,
       value ?? _haptics.value,
       persist,
@@ -163,8 +181,8 @@ class SettingsService extends ChangeNotifier {
 
   bool get showFullDetails => _showFullDetails.value;
   ValueNotifier<bool> get showFullDetailsListener => _showFullDetails;
-  Future<void> setShowFullDetails(bool? value,{ bool persist = true}) async {
-    _showFullDetails.value = await PrefHelper.boolSetter(
+  Future<void> setShowFullDetails(bool? value, {bool persist = true}) async {
+    _showFullDetails.value = await _sharedPref.boolSetter(
       _Keys.fullResultText,
       value ?? _showFullDetails.value,
       persist,
@@ -173,8 +191,8 @@ class SettingsService extends ChangeNotifier {
 
   bool get scanQrCodeOnly => _qrCodeOnly.value;
   ValueNotifier<bool> get qrCodeOnlyListener => _qrCodeOnly;
-  Future<void> setScanQrCodeOnly(bool? value,{ bool persist = true}) async {
-    _qrCodeOnly.value = await PrefHelper.boolSetter(
+  Future<void> setScanQrCodeOnly(bool? value, {bool persist = true}) async {
+    _qrCodeOnly.value = await _sharedPref.boolSetter(
       _Keys.qrOnly,
       value ?? _qrCodeOnly.value,
       persist,

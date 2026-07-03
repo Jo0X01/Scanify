@@ -1,44 +1,44 @@
-import 'package:qrcode_scanner_app/core/constants/app_assets.dart'
+import 'package:scanify/core/constants/app_assets.dart'
     show AppIcons;
-import 'package:qrcode_scanner_app/core/enum/tool_data_types.dart'
+import 'package:scanify/core/enum/tool_data_types.dart'
     show PopularType;
-import 'package:qrcode_scanner_app/features/generate/view/config/tool_config.dart'
+import 'package:scanify/features/generate/view/config/tool_config.dart'
     show ToolConfig;
-import 'package:qrcode_scanner_app/features/generate/view/controller/tools/contact_controller.dart'
+import 'package:scanify/features/generate/view/controller/tools/contact_controller.dart'
     show ContactController;
-import 'package:qrcode_scanner_app/features/generate/view/controller/tools/email_controller.dart'
+import 'package:scanify/features/generate/view/controller/tools/email_controller.dart'
     show EmailController;
-import 'package:qrcode_scanner_app/features/generate/view/controller/tools/event_controller.dart'
+import 'package:scanify/features/generate/view/controller/tools/event_controller.dart'
     show EventController;
-import 'package:qrcode_scanner_app/features/generate/view/controller/tools/location_controller.dart'
+import 'package:scanify/features/generate/view/controller/tools/location_controller.dart'
     show LocationController;
-import 'package:qrcode_scanner_app/features/generate/view/controller/tools/phone_controller.dart'
+import 'package:scanify/features/generate/view/controller/tools/phone_controller.dart'
     show PhoneController;
-import 'package:qrcode_scanner_app/features/generate/view/controller/tools/sms_controller.dart'
+import 'package:scanify/features/generate/view/controller/tools/sms_controller.dart'
     show SmsController;
-import 'package:qrcode_scanner_app/features/generate/view/controller/tools/text_controller.dart'
+import 'package:scanify/features/generate/view/controller/tools/text_controller.dart'
     show TextController;
-import 'package:qrcode_scanner_app/features/generate/view/controller/tools/website_controller.dart'
+import 'package:scanify/features/generate/view/controller/tools/website_controller.dart'
     show WebsiteController;
-import 'package:qrcode_scanner_app/features/generate/view/controller/tools/wifi_controller.dart'
+import 'package:scanify/features/generate/view/controller/tools/wifi_controller.dart'
     show WifiController;
-import 'package:qrcode_scanner_app/features/generate/view/widgets/templates/contact_template.dart'
+import 'package:scanify/features/generate/view/widgets/templates/contact_template.dart'
     show ContactTemplate;
-import 'package:qrcode_scanner_app/features/generate/view/widgets/templates/email_template.dart'
+import 'package:scanify/features/generate/view/widgets/templates/email_template.dart'
     show EmailTemplate;
-import 'package:qrcode_scanner_app/features/generate/view/widgets/templates/event_template.dart'
+import 'package:scanify/features/generate/view/widgets/templates/event_template.dart'
     show EventTemplate;
-import 'package:qrcode_scanner_app/features/generate/view/widgets/templates/location_template.dart'
+import 'package:scanify/features/generate/view/widgets/templates/location_template.dart'
     show LocationTemplate;
-import 'package:qrcode_scanner_app/features/generate/view/widgets/templates/phone_template.dart'
+import 'package:scanify/features/generate/view/widgets/templates/phone_template.dart'
     show PhoneTemplate;
-import 'package:qrcode_scanner_app/features/generate/view/widgets/templates/sms_template.dart'
+import 'package:scanify/features/generate/view/widgets/templates/sms_template.dart'
     show SmsTemplate;
-import 'package:qrcode_scanner_app/features/generate/view/widgets/templates/text_template.dart'
+import 'package:scanify/features/generate/view/widgets/templates/text_template.dart'
     show TextTemplate;
-import 'package:qrcode_scanner_app/features/generate/view/widgets/templates/website_template.dart'
+import 'package:scanify/features/generate/view/widgets/templates/website_template.dart'
     show WebsiteTemplate;
-import 'package:qrcode_scanner_app/features/generate/view/widgets/templates/wifi_template.dart'
+import 'package:scanify/features/generate/view/widgets/templates/wifi_template.dart'
     show WifiTemplate;
 
 ToolConfig getPopularTool(PopularType val) => switch (val) {
@@ -102,7 +102,7 @@ ToolConfig getPopularTool(PopularType val) => switch (val) {
     title: (l) => l.location,
     buildController: (l) => LocationController(
       title: l.location,
-      iconSvgPath: AppIcons.contactIcon,
+      iconSvgPath: AppIcons.locationIcon,
     ),
     buildTemplate: (c) =>
         LocationTemplate(templateController: c as LocationController),

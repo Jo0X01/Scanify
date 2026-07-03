@@ -1,8 +1,8 @@
-import 'package:qrcode_scanner_app/core/enum/validation_error.dart' show ValidationError;
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart';
+import 'package:scanify/core/enum/validation_error.dart' show ValidationError;
+import 'package:scanify/core/l10n/app_localizations.dart';
 
 const String emailRegexString =
-    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
+    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
 const String passwordRegexString = r'^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@]{6,}$';
 const String urlRegexString = r'^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/.*)?$';
 
@@ -92,7 +92,7 @@ abstract class Validator {
     }
     final lat = double.tryParse(value.trim());
     if (lat == null) return ValidationError.latitudeNotNumber;
-    if (lat < -85.0 || lat > 85.0) return ValidationError.latitudeOutOfRange;
+    if (lat < -90.0 || lat > 90.0) return ValidationError.latitudeOutOfRange;
     return null;
   }
 

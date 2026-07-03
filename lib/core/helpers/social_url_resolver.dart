@@ -1,4 +1,4 @@
-import 'package:qrcode_scanner_app/core/enum/tool_data_types.dart'
+import 'package:scanify/core/enum/tool_data_types.dart'
     show SocialType;
 
 class _SocialConfig {

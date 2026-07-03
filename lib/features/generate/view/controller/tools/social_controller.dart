@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:mobile_scanner/mobile_scanner.dart'
     show BarcodeType, BarcodeFormat;
-import 'package:qrcode_scanner_app/core/helpers/social_url_resolver.dart'
+import 'package:scanify/core/helpers/social_url_resolver.dart'
     show SocialUrlResolver;
-import 'package:qrcode_scanner_app/core/enum/tool_data_types.dart';
-import 'package:qrcode_scanner_app/features/generate/view/controller/interface/generate_template_controller.dart';
+import 'package:scanify/core/enum/tool_data_types.dart';
+import 'package:scanify/features/generate/view/controller/interface/generate_template_controller.dart';
 
 class SocialController implements SocialTemplateController {
   @override

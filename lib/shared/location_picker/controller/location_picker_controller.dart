@@ -1,4 +1,3 @@
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geocoding/geocoding.dart' show Placemark;
@@ -116,7 +115,6 @@ class LocationPickerController {
     await _loadCurrentLocation();
   }
 
-  /// Called when the user taps the map.
   Future<void> onMapTap(TapPosition tapPosition, LatLng tapped) async {
     await _resolveAndUpdate(tapped);
     onSelectPosition?.call(_result);
@@ -124,21 +122,23 @@ class LocationPickerController {
 
   void zoomIn() {
     if (_result.isLocationEmpty) return;
-    if ((mapController.camera.maxZoom ?? 4) <= mapController.camera.zoom + 3) {
-      return;
-    }
-    mapController.move(_result.location!, mapController.camera.zoom + 3);
+    final maxZoom = mapController.camera.maxZoom ?? 18.0;
+    final targetZoom = (mapController.camera.zoom + 3)
+        .clamp(0.0, maxZoom)
+        .toDouble();
+    mapController.move(_result.location!, targetZoom);
   }
 
   void zoomOut() {
     if (_result.isLocationEmpty) return;
-    if ((mapController.camera.minZoom ?? 4) >= mapController.camera.zoom - 3) {
-      return;
-    }
-    mapController.move(_result.location!, mapController.camera.zoom - 3);
+
+    final minZoom = mapController.camera.minZoom ?? 0.0;
+    final targetZoom = (mapController.camera.zoom - 3)
+        .clamp(minZoom, 22.0)
+        .toDouble();
+    mapController.move(_result.location!, targetZoom);
   }
 
-  /// Moves the map camera to the current result's location (if any).
   void goToCurrentLocation() {
     if (_result.isLocationEmpty) return;
     mapController.rotate(0);
@@ -153,7 +153,6 @@ class LocationPickerController {
 
   /// Geocodes the text in [searchController] and moves the map there.
   Future<void> searchAddress([String? query]) async {
-    if(_locationNotifier.value == null) return;
     final q = query ?? searchController.text.trim();
     if (q.isEmpty) return;
 
@@ -177,6 +176,7 @@ class LocationPickerController {
     _statusNotifier.dispose();
     _tileErrorNotifier.dispose();
     searchController.dispose();
+    mapController.dispose();
   }
 
   // ---------------------------------------------------------------------------

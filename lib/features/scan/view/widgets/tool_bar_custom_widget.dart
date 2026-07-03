@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
 
 class ToolBarData {
   final String icon;
-  final Function()? onTap;
-  bool isSelected = false;
+  final Function(bool)? onTap;
+  final ValueNotifier<bool>? isSelectedListener;
+  final bool? isSelected;
   final bool callDefaultOnTap;
-  ToolBarData({required this.icon, this.onTap, this.callDefaultOnTap = true});
+
+  ToolBarData({
+    required this.icon,
+    this.onTap,
+    this.callDefaultOnTap = true,
+    this.isSelectedListener,
+    this.isSelected,
+  });
 }
 
 class ToolBarCustomWidget extends StatefulWidget {
@@ -24,41 +31,42 @@ class _ToolBarCustomWidgetState extends State<ToolBarCustomWidget> {
     final w = MediaQuery.of(context).size.width;
     return Container(
       alignment: Alignment.center,
-      width: w / 0.80,
+      width: w * 0.80,
       padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
       margin: EdgeInsets.symmetric(horizontal: 60, vertical: 30),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: AppColors.tabBackground,
+        color: Theme.of(context).colorScheme.surface,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: widget.tools
-            .map((tool) => _toolIcon(index: widget.tools.indexOf(tool)))
+            .map(
+              (tool) => ValueListenableBuilder(
+                valueListenable:
+                    tool.isSelectedListener ??
+                    ValueNotifier(tool.isSelected ?? false),
+                builder: (_, isSelectedValue, _) {
+                  return GestureDetector(
+                    onTap: () {
+                      tool.onTap?.call(isSelectedValue);
+                    },
+                    child: SvgPicture.asset(
+                      tool.icon,
+                      width: 25,
+                      height: 25,
+                      colorFilter: ColorFilter.mode(
+                        isSelectedValue
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.outlineVariant,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )
             .toList(),
-      ),
-    );
-  }
-
-  Widget _toolIcon({required int index}) {
-    final tool = widget.tools[index];
-
-    return GestureDetector(
-      onTap: () {
-        tool.onTap?.call();
-        if (widget.tools[index].callDefaultOnTap) {
-          widget.tools[index].isSelected = !widget.tools[index].isSelected;
-          setState(() {});
-        }
-      },
-      child: SvgPicture.asset(
-        tool.icon,
-        width: 25,
-        height: 25,
-        colorFilter: ColorFilter.mode(
-          tool.isSelected ? Colors.orange : AppColors.iconColor,
-          BlendMode.srcIn,
-        ),
       ),
     );
   }

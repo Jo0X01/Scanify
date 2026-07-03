@@ -1,5 +1,4 @@
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart'
-    show AppLocalizations;
+import 'package:scanify/core/l10n/app_localizations.dart' show AppLocalizations;
 
 enum QrErrorCorrectionLevel {
   auto(1),
@@ -23,6 +22,7 @@ enum QrErrorCorrectionLevel {
     QrErrorCorrectionLevel.auto: l.qrErrorCorrectionLvLAuto,
     QrErrorCorrectionLevel.low: l.qrErrorCorrectionLowLvL,
     QrErrorCorrectionLevel.med: l.qrErrorCorrectionMedLvL,
+    QrErrorCorrectionLevel.quartile: l.qrErrorCorrectionQuartileLvL,
     QrErrorCorrectionLevel.high: l.qrErrorCorrectionHighLvL,
   };
 }

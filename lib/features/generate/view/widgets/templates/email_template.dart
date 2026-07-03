@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart';
-import 'package:qrcode_scanner_app/core/utils/validator.dart';
-import 'package:qrcode_scanner_app/features/generate/view/controller/tools/email_controller.dart';
-import 'package:qrcode_scanner_app/shared/widgets/text_form_field_with_label_custom_widget.dart';
+import 'package:scanify/core/extensions/context_addons_extension.dart';
+import 'package:scanify/core/utils/validator.dart';
+import 'package:scanify/features/generate/view/controller/tools/email_controller.dart';
+import 'package:scanify/shared/widgets/text_form_field_with_label_custom_widget.dart';
 
 class EmailTemplate extends StatefulWidget {
   const EmailTemplate({super.key, required this.templateController});
@@ -15,27 +15,26 @@ class EmailTemplate extends StatefulWidget {
 class _EmailTemplateeState extends State<EmailTemplate> {
   @override
   Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context)!;
     return Column(
       spacing: 20,
       children: [
         TextFormFieldWithLabelCustomWidget(
           controller: widget.templateController.emailController,
-          validator: (val) => Validator.validateEmail(val)?.message(l),
-          hintText: l.enterEmail,
+          validator: (val) => Validator.validateEmail(val)?.message(context.l),
+          hintText: context.l.enterEmail,
         ),
         TextFormFieldWithLabelCustomWidget(
           controller: widget.templateController.subjectController,
           validator: (val) =>
-              Validator.validateIgnoreEmpty(val, Validator.validateContent,l),
-          hintText: l.subjectEnterOptional,
+              Validator.validateIgnoreEmpty(val, Validator.validateContent,context.l),
+          hintText: context.l.subjectEnterOptional,
         ),
         TextFormFieldWithLabelCustomWidget(
           isTextBox: true,
           controller: widget.templateController.bodyController,
           validator: (val) =>
-              Validator.validateIgnoreEmpty(val, Validator.validateContent,l),
-          hintText: l.bodyEnterOptional,
+              Validator.validateIgnoreEmpty(val, Validator.validateContent,context.l),
+          hintText: context.l.bodyEnterOptional,
         ),
       ],
     );

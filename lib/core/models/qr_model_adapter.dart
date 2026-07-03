@@ -1,12 +1,7 @@
-
-
-
-
 import 'package:hive/hive.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:qrcode_scanner_app/core/enum/qr_error_correction.dart';
-import 'package:qrcode_scanner_app/core/enum/qr_source_type.dart';
-import 'package:qrcode_scanner_app/core/models/qrcode_model.dart';
+import 'package:scanify/core/enum/qr_source_type.dart';
+import 'package:scanify/core/models/qrcode_model.dart';
 
 class QRCodeModelAdapter extends TypeAdapter<QRCodeModel> {
   @override
@@ -34,8 +29,7 @@ class QRCodeModelAdapter extends TypeAdapter<QRCodeModel> {
           : null,
       type: fields[8] != null
           ? BarcodeType.values.byName(fields[8] as String)
-          : null,
-      eccLevel: fields[9] as QrErrorCorrectionLevel?,
+          : null
     );
   }
 
@@ -50,8 +44,7 @@ class QRCodeModelAdapter extends TypeAdapter<QRCodeModel> {
       obj.isFavorite,
       obj.source?.name,
       obj.format?.name,
-      obj.type?.name,
-      obj.eccLevel,
+      obj.type?.name
     ];
 
     writer.writeByte(fields.length);

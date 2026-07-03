@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:qrcode_scanner_app/core/constants/app_assets.dart';
-import 'package:qrcode_scanner_app/core/constants/app_routes.dart';
+import 'package:scanify/core/constants/app_assets.dart';
+import 'package:scanify/core/extensions/context_addons_extension.dart';
 
 class CustomAppbarMenuAction {
   final String? icon;
@@ -58,7 +58,7 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
               onTap: () {
                 onBackPressed?.call();
                 if (justGoBack) {
-                  AppRoutes.goBack(context);
+                  context.goBack();
                 }
               },
               child: SizedBox(
@@ -77,8 +77,8 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
                     child: SvgPicture.asset(
                       AppIcons.backIcon,
                       matchTextDirection: true,
-                      width: iconSize - 20,
-                      height: iconSize - 20,
+                      width: iconSize,
+                      height: iconSize,
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -99,12 +99,19 @@ class CustomBackAppBar extends StatelessWidget implements PreferredSizeWidget {
       actionsPadding: EdgeInsets.symmetric(horizontal: 10),
       actions: [
         if (addSettings)
-          GestureDetector(
-            onTap: () => AppRoutes.navigateToSettings(context),
-            child: SvgPicture.asset(
-              AppIcons.settingsIcon,
-              width: iconSize,
-              height: iconSize,
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 10),
+            child: GestureDetector(
+              onTap: context.goToSettings,
+              child: SvgPicture.asset(
+                AppIcons.settingsIcon,
+                width: iconSize,
+                height: iconSize,
+                colorFilter: ColorFilter.mode(
+                  Theme.of(context).colorScheme.primary,
+                  BlendMode.srcIn,
+                ),
+              ),
             ),
           ),
         if (menuItems != null && menuItems!.isNotEmpty)

@@ -9,7 +9,7 @@ class SearchBarCustomWidget extends StatelessWidget {
     this.enableFilter,
     this.onFilter,
     this.hintText,
-    this.margin
+    this.margin,
   });
   final EdgeInsetsGeometry? margin;
   final TextEditingController? controller;
@@ -40,6 +40,9 @@ class SearchBarCustomWidget extends StatelessWidget {
               : const SizedBox.shrink(),
         ],
         hintText: hintText,
+        backgroundColor: WidgetStatePropertyAll(
+          Theme.of(context).colorScheme.outline,
+        ),
         hintStyle: WidgetStatePropertyAll(
           Theme.of(context).textTheme.labelMedium,
         ),

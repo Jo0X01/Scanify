@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart';
-import 'package:qrcode_scanner_app/shared/widgets/custom_back_appbar.dart'
+import 'package:scanify/core/extensions/context_addons_extension.dart';
+import 'package:scanify/shared/widgets/custom_back_appbar.dart'
     show CustomBackAppBar;
 
 class NoQrDataWidget extends StatelessWidget {
@@ -8,12 +8,10 @@ class NoQrDataWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
     return Scaffold(
-      appBar: CustomBackAppBar(title: l.details),
+      appBar: CustomBackAppBar(title: context.l.details),
       body: Center(
-        child: Text(l.noDataProvided, style: theme.textTheme.bodyMedium),
+        child: Text(context.l.noDataProvided, style: context.theme.textTheme.bodyMedium),
       ),
     );
   }

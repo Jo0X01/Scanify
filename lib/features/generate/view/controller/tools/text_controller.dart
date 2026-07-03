@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:mobile_scanner/mobile_scanner.dart' show BarcodeType, BarcodeFormat;
-import 'package:qrcode_scanner_app/core/enum/tool_data_types.dart'
+import 'package:scanify/core/enum/tool_data_types.dart'
     show PopularType;
-import 'package:qrcode_scanner_app/features/generate/view/controller/interface/generate_template_controller.dart' show PopularTemplateController;
+import 'package:scanify/features/generate/view/controller/interface/generate_template_controller.dart' show PopularTemplateController;
 
 class TextController implements PopularTemplateController {
   late TextEditingController _text;

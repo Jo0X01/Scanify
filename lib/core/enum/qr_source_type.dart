@@ -1,6 +1,6 @@
 import 'package:mobile_scanner/mobile_scanner.dart'
     show BarcodeType, BarcodeFormat;
-import 'package:qrcode_scanner_app/core/l10n/app_localizations.dart';
+import 'package:scanify/core/l10n/app_localizations.dart';
 
 enum QrSourceType {
   unknown(-1),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:qrcode_scanner_app/core/constants/app_colors.dart';
 
 class SwitchCustomWidget extends StatefulWidget {
   const SwitchCustomWidget({
@@ -83,9 +82,11 @@ class _SwitchCustomWidgetState extends State<SwitchCustomWidget>
 
   @override
   Widget build(BuildContext context) {
-    final activeColor = widget.activeColor ?? AppColors.primary;
+    final activeColor =
+        widget.activeColor ?? Theme.of(context).colorScheme.primary;
     final inactiveColor =
-        widget.inactiveColor ?? AppColors.textSecondary.withValues(alpha: 0.25);
+        widget.inactiveColor ??
+        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25);
 
     return GestureDetector(
       onTap: _handleTap,
